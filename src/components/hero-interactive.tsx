@@ -8,13 +8,26 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 // ============================================
-// 1. MOUSE PARALLAX HOOK (Limited movement)
+// 1. MOUSE PARALLAX HOOK (Limited movement, disabled on mobile)
 // ============================================
 function useMouseParallax(strength: number = 1) {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    // Check if mobile device
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) return; // Disable on mobile
+    
     const handleMouseMove = (e: MouseEvent) => {
       const { clientX, clientY } = e;
       const { innerWidth, innerHeight } = window;
@@ -24,9 +37,9 @@ function useMouseParallax(strength: number = 1) {
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [strength, mouseX, mouseY]);
+  }, [strength, mouseX, mouseY, isMobile]);
 
-  return { mouseX, mouseY };
+  return { mouseX, mouseY, isMobile };
 }
 
 // ============================================
@@ -348,8 +361,8 @@ export function InteractiveHeroSection({
     { label: 'Award Winning', value: '2025' },
   ]
 }: InteractiveHeroSectionProps) {
-  // Very subtle parallax - only 5px movement max
-  const { mouseX, mouseY } = useMouseParallax(1);
+  // Very subtle parallax - only 5px movement max, disabled on mobile
+  const { mouseX, mouseY, isMobile } = useMouseParallax(1);
   const backgroundX = useSpring(useTransform(mouseX, (v) => v * 5), { stiffness: 100, damping: 30 });
   const backgroundY = useSpring(useTransform(mouseY, (v) => v * 5), { stiffness: 100, damping: 30 });
 
@@ -359,31 +372,44 @@ export function InteractiveHeroSection({
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-charcoal">
       {/* Background Image - Fixed position, no white space issue */}
       <div className="absolute inset-0">
-        <motion.div
-          className="absolute inset-[-20px]" // Extra padding to prevent white edges
-          style={{ x: backgroundX, y: backgroundY }}
-        >
+        {/* Only apply parallax on desktop */}
+        {!isMobile && (
+          <motion.div
+            className="absolute inset-[-20px]"
+            style={{ x: backgroundX, y: backgroundY }}
+          >
+            <img
+              src="/images/malipula/hero.jpg"
+              alt="Malipula Suits"
+              className="w-[calc(100%+40px)] h-[calc(100%+40px)] object-cover object-center"
+            />
+          </motion.div>
+        )}
+        {/* Static background for mobile */}
+        {isMobile && (
           <img
             src="/images/malipula/hero.jpg"
             alt="Malipula Suits"
-            className="w-[calc(100%+40px)] h-[calc(100%+40px)] object-cover object-center"
+            className="absolute inset-0 w-full h-full object-cover object-center"
           />
-        </motion.div>
+        )}
         {/* Dark gradient overlay - covers entire screen */}
-        <div className="absolute inset-0 bg-gradient-to-r from-charcoal/97 via-charcoal/85 to-charcoal/70" />
-        {/* Additional bottom gradient for smooth transition */}
-        <div className="absolute inset-0 bg-gradient-to-t from-charcoal/50 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-charcoal/97 via-charcoal/90 to-charcoal/75" />
+        {/* Mobile gradient - more centered */}
+        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/50 via-transparent to-charcoal/60 sm:hidden" />
       </div>
 
-      {/* Floating Particles */}
+      {/* Floating Particles - fewer on mobile */}
       <FloatingParticles />
 
-      {/* Decorative Elements */}
-      <DecorativeElements />
+      {/* Decorative Elements - hidden on mobile */}
+      <div className="hidden sm:block">
+        <DecorativeElements />
+      </div>
 
       {/* Main Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 md:pt-36 pb-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-28 md:pt-32 lg:pt-36 pb-16 sm:pb-20">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left Content */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -396,25 +422,25 @@ export function InteractiveHeroSection({
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3 }}
-              className="mb-6"
+              className="mb-4 sm:mb-6"
             >
-              <Badge className="bg-gold/15 text-gold border-gold/25 px-4 py-2 text-sm backdrop-blur-sm">
+              <Badge className="bg-gold/15 text-gold border-gold/25 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm backdrop-blur-sm">
                 <motion.div
                   animate={{ rotate: [0, 10, -10, 0] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
-                  <Crown className="w-4 h-4 mr-2" />
+                  <Crown className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
                 </motion.div>
-                Award-Winning Tailor - EAGMA 2025
+                Award-Winning Tailor
               </Badge>
             </motion.div>
 
-            {/* Main Heading */}
+            {/* Main Heading - responsive sizing */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-tight mb-6"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight mb-4 sm:mb-6"
             >
               Royal.{' '}
               <span className="text-gold-gradient">Rooted.</span>
@@ -427,7 +453,7 @@ export function InteractiveHeroSection({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
-              className="text-xl sm:text-2xl text-amber-400 mb-4 h-8"
+              className="text-base sm:text-lg md:text-xl text-amber-400 mb-3 sm:mb-4 h-6 sm:h-8"
             >
               <TypewriterText words={typewriterWords} className="font-light" />
             </motion.div>
@@ -437,27 +463,27 @@ export function InteractiveHeroSection({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="text-lg text-gray-300 mb-8 max-w-lg mx-auto lg:mx-0"
+              className="text-sm sm:text-base md:text-lg text-gray-300 mb-6 sm:mb-8 max-w-lg mx-auto lg:mx-0 px-2 sm:px-0"
             >
               Where craftsmanship meets elegance, and tradition blends seamlessly with modern style.
               Experience exceptional tailoring from the heart of Dar es Salaam.
             </motion.p>
 
-            {/* CTA Buttons */}
+            {/* CTA Buttons - full width on mobile */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start px-2 sm:px-0"
             >
               <MagneticButton href="/shop" strength={0.15}>
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 font-semibold text-lg px-8 py-6 shadow-lg shadow-amber-500/20 transition-all duration-300 group"
+                  className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 font-semibold text-sm sm:text-base md:text-lg px-6 sm:px-8 py-5 sm:py-6 shadow-lg shadow-amber-500/20 transition-all duration-300 group"
                 >
-                  <ShoppingBag className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                  <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 mr-2 group-hover:scale-110 transition-transform" />
                   Shop Collection
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </MagneticButton>
 
@@ -465,30 +491,30 @@ export function InteractiveHeroSection({
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-2 border-amber-500/40 text-amber-400 hover:bg-amber-500 hover:text-slate-900 hover:border-amber-500 font-semibold text-lg px-8 py-6 transition-all duration-300 backdrop-blur-sm"
+                  className="w-full sm:w-auto border-2 border-amber-500/40 text-amber-400 hover:bg-amber-500 hover:text-slate-900 hover:border-amber-500 font-semibold text-sm sm:text-base md:text-lg px-6 sm:px-8 py-5 sm:py-6 transition-all duration-300 backdrop-blur-sm"
                 >
-                  <Play className="w-5 h-5 mr-2" />
+                  <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   Book Fitting
                 </Button>
               </MagneticButton>
             </motion.div>
 
-            {/* Animated Stats */}
+            {/* Animated Stats - 2x2 grid on mobile, 4 columns on larger */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1 }}
-              className="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-12 pt-8 border-t border-white/10"
+              className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 mt-8 sm:mt-10 md:mt-12 pt-6 sm:pt-8 border-t border-white/10"
             >
               {stats.map((stat, index) => (
                 <motion.div
                   key={index}
-                  className="text-center"
+                  className="text-center py-2"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 1.2 + index * 0.1 }}
                 >
-                  <div className="text-2xl sm:text-3xl font-bold text-gold-gradient">
+                  <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gold-gradient">
                     {stat.numericValue ? (
                       <AnimatedCounter 
                         value={stat.numericValue} 
@@ -498,30 +524,30 @@ export function InteractiveHeroSection({
                       stat.value
                     )}
                   </div>
-                  <div className="text-sm text-gray-400 mt-1">{stat.label}</div>
+                  <div className="text-xs sm:text-sm text-gray-400 mt-0.5 sm:mt-1">{stat.label}</div>
                 </motion.div>
               ))}
             </motion.div>
           </motion.div>
 
-          {/* Right Content - Brand Card with 3D Tilt */}
+          {/* Right Content - Brand Card (hidden on mobile, shown on tablet+) */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
             className="hidden lg:flex justify-center items-center"
           >
-            <TiltCard className="relative w-80" glareEnabled>
+            <TiltCard className="relative w-72 xl:w-80" glareEnabled>
               <motion.div
                 animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
               >
-                <div className="relative bg-slate-900/70 backdrop-blur-xl rounded-3xl p-8 text-center border border-amber-500/15 shadow-2xl">
+                <div className="relative bg-slate-900/70 backdrop-blur-xl rounded-3xl p-6 xl:p-8 text-center border border-amber-500/15 shadow-2xl">
                   {/* Decorative corner accents */}
-                  <div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-amber-500/30 rounded-tl-3xl" />
-                  <div className="absolute top-0 right-0 w-16 h-16 border-t-2 border-r-2 border-amber-500/30 rounded-tr-3xl" />
-                  <div className="absolute bottom-0 left-0 w-16 h-16 border-b-2 border-l-2 border-amber-500/30 rounded-bl-3xl" />
-                  <div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-amber-500/30 rounded-br-3xl" />
+                  <div className="absolute top-0 left-0 w-14 h-14 border-t-2 border-l-2 border-amber-500/30 rounded-tl-3xl" />
+                  <div className="absolute top-0 right-0 w-14 h-14 border-t-2 border-r-2 border-amber-500/30 rounded-tr-3xl" />
+                  <div className="absolute bottom-0 left-0 w-14 h-14 border-b-2 border-l-2 border-amber-500/30 rounded-bl-3xl" />
+                  <div className="absolute bottom-0 right-0 w-14 h-14 border-b-2 border-r-2 border-amber-500/30 rounded-br-3xl" />
 
                   {/* Animated Logo */}
                   <motion.div
@@ -532,22 +558,22 @@ export function InteractiveHeroSection({
                     <img
                       src="/images/malipula/m.png"
                       alt="Malipula"
-                      className="w-24 h-24 mx-auto object-contain"
+                      className="w-20 h-20 xl:w-24 xl:h-24 mx-auto object-contain"
                     />
                   </motion.div>
 
-                  <h3 className="text-2xl font-bold text-white mb-1">MALIPULA SUITS</h3>
-                  <p className="text-amber-400 mb-4 text-base">Crafting Excellence Since 2015</p>
+                  <h3 className="text-xl xl:text-2xl font-bold text-white mb-1">MALIPULA SUITS</h3>
+                  <p className="text-amber-400 mb-3 text-sm xl:text-base">Crafting Excellence Since 2015</p>
 
                   {/* Animated Stars */}
-                  <div className="flex justify-center gap-0.5 mb-3">
+                  <div className="flex justify-center gap-0.5 mb-2">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <motion.div
                         key={star}
                         animate={{ scale: [1, 1.15, 1], rotate: [0, 5, -5, 0] }}
                         transition={{ duration: 2, repeat: Infinity, delay: star * 0.1 }}
                       >
-                        <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                        <Star className="w-4 h-4 xl:w-5 xl:h-5 text-amber-400 fill-amber-400" />
                       </motion.div>
                     ))}
                   </div>
@@ -557,9 +583,9 @@ export function InteractiveHeroSection({
                   <motion.div
                     animate={{ rotate: [0, 360] }}
                     transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
-                    className="absolute -bottom-3 -right-3 w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center shadow-lg shadow-amber-500/30"
+                    className="absolute -bottom-2 -right-2 w-10 h-10 xl:w-12 xl:h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center shadow-lg shadow-amber-500/30"
                   >
-                    <Scissors className="w-5 h-5 text-slate-900" />
+                    <Scissors className="w-4 h-4 xl:w-5 xl:h-5 text-slate-900" />
                   </motion.div>
                 </div>
               </motion.div>
@@ -572,7 +598,7 @@ export function InteractiveHeroSection({
       <ScrollIndicator />
 
       {/* Bottom gradient for smooth section transition */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-20 sm:h-24 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none" />
     </section>
   );
 }
