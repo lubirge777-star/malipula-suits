@@ -18,8 +18,6 @@ import {
   Phone,
   Play,
   Quote,
-  Layers,
-  Palette,
   Award,
   Sparkles,
 } from 'lucide-react';
@@ -29,7 +27,7 @@ import { Badge } from '@/components/ui/badge';
 import { CinematicIntro } from '@/components/preloader';
 import { Marquee } from '@/components/marquee';
 import { WhatsAppButton } from '@/components/whatsapp-button';
-import { FeatureCards } from '@/components/horizontal-scroll';
+import { ServicesCarousel } from '@/components/services-carousel';
 import { ProductIndicators, FeatureCallout } from '@/components/product-indicators';
 import { ScrollReveal, ScrollProgress } from '@/components/scroll-animations';
 import { Navigation } from '@/components/navigation';
@@ -220,45 +218,7 @@ const features = [
   },
 ];
 
-// Why Choose Malipula feature sections
-const whyChooseFeatures = [
-  {
-    id: 'craftsmanship',
-    title: 'Craftsmanship',
-    subtitle: 'Expert Artistry',
-    description: 'Every stitch tells a story of dedication and precision, crafted by master tailors with decades of experience.',
-    image: '/images/malipula/service1.jpg',
-    icon: <Scissors className="w-6 h-6" />,
-    gradient: 'bg-gradient-to-br from-slate-900 to-slate-800',
-  },
-  {
-    id: 'quality',
-    title: 'Quality Fabrics',
-    subtitle: 'Premium Materials',
-    description: 'We source only the finest fabrics from around the world, ensuring comfort, durability, and elegance.',
-    image: '/images/malipula/service2.jpg',
-    icon: <Layers className="w-6 h-6" />,
-    gradient: 'bg-gradient-to-br from-slate-800 to-slate-900',
-  },
-  {
-    id: 'customization',
-    title: 'Custom Fit',
-    subtitle: 'Made for You',
-    description: 'Your measurements, your style, your preferences. Each garment is uniquely tailored to your body.',
-    image: '/images/malipula/service3.jpg',
-    icon: <Ruler className="w-6 h-6" />,
-    gradient: 'bg-gradient-to-br from-slate-900 to-slate-800',
-  },
-  {
-    id: 'heritage',
-    title: 'African Heritage',
-    subtitle: 'Rooted in Tradition',
-    description: 'We celebrate African culture through contemporary designs that honor our rich heritage.',
-    image: '/images/malipula/service4.jpg',
-    icon: <Palette className="w-6 h-6" />,
-    gradient: 'bg-gradient-to-br from-slate-800 to-slate-900',
-  },
-];
+// whyChooseFeatures removed - now using ServicesCarousel component
 
 // Product indicators for a suit - ACCURATE positions for a formal suit
 const suitIndicators = [
@@ -446,10 +406,7 @@ export default function MalipulaHome() {
             </div>
           </ScrollTriggeredSection>
 
-          <FeatureCards
-            sections={whyChooseFeatures}
-            autoPlayInterval={6000}
-          />
+          <ServicesCarousel autoPlayInterval={5000} />
         </div>
       </section>
 
