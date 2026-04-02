@@ -54,8 +54,8 @@ const phases = [
 // Calculate total duration
 const TOTAL_DURATION = phases.reduce((acc, p) => acc + p.duration, 0);
 
-// Local storage key for tracking if intro was shown
-const INTRO_SHOWN_KEY = 'malipula_intro_shown';
+// Local storage key for tracking if intro was shown (localStorage for persistence across sessions)
+const INTRO_SHOWN_KEY = 'malipula_intro_shown_permanent';
 
 // Cinematic intro with visuals and animations
 export function CinematicIntro({ 
@@ -75,8 +75,8 @@ export function CinematicIntro({
   useEffect(() => {
     setMounted(true);
     
-    // Check if intro was already shown in this session
-    const introShown = sessionStorage.getItem(INTRO_SHOWN_KEY);
+    // Check if intro was already shown (using localStorage for persistence)
+    const introShown = localStorage.getItem(INTRO_SHOWN_KEY);
     if (introShown === 'true') {
       // Already shown, skip intro
       setIsComplete(true);
@@ -116,7 +116,7 @@ export function CinematicIntro({
 
     // Final completion timer
     const completeTimer = setTimeout(() => {
-      sessionStorage.setItem(INTRO_SHOWN_KEY, 'true');
+      localStorage.setItem(INTRO_SHOWN_KEY, 'true');
       setIsComplete(true);
       onComplete?.();
     }, TOTAL_DURATION + 800);
@@ -405,7 +405,7 @@ export function CinematicIntro({
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5 }}
             onClick={() => {
-              sessionStorage.setItem(INTRO_SHOWN_KEY, 'true');
+              localStorage.setItem(INTRO_SHOWN_KEY, 'true');
               setIsComplete(true);
               onComplete?.();
             }}

@@ -149,7 +149,7 @@ const testimonials = [
     id: 2,
     name: 'Dr. Amina Hassan',
     role: 'Medical Director',
-    image: '/images/malipula/review2.jpg',
+    image: '/images/malipula/review2-female.jpg',
     content:
       'The quality of fabrics and the precision of tailoring at Malipula is unmatched in Dar es Salaam. Their team truly understands the art of bespoke tailoring.',
     rating: 5,
@@ -185,7 +185,7 @@ const team = [
   {
     name: 'Anna Mbeki',
     role: 'Customer Relations',
-    image: '/images/malipula/team4.jpg',
+    image: '/images/malipula/team4-female.jpg',
   },
 ];
 
@@ -259,47 +259,47 @@ const whyChooseFeatures = [
   },
 ];
 
-// Product indicators for a suit - ACCURATE positions
+// Product indicators for a suit - ACCURATE positions for a formal suit
 const suitIndicators = [
   {
     id: 'lapel',
-    x: 48, // Center of chest area
-    y: 28, // Upper chest where lapels are
+    x: 50, // Center - where lapels meet
+    y: 22, // Upper chest - lapels are visible here
     title: 'Peak Lapel',
-    description: 'Hand-crafted peak lapels with pick stitching detail.',
-    details: ['100% Wool', 'Hand-finished edges', 'Satin trim option'],
+    description: 'Hand-crafted peak lapels with pick stitching detail for a refined look.',
+    details: ['100% Wool construction', 'Hand-finished edges', 'Satin trim option available'],
   },
   {
     id: 'chest-pocket',
-    x: 35, // Left chest area
-    y: 32, // Just below lapel
-    title: 'Chest Pocket',
-    description: 'Classic welt pocket for your pocket square.',
-    details: ['Reinforced stitching', 'Perfect angle', 'Hand-sewn edges'],
+    x: 32, // Left chest area
+    y: 28, // Just below the shoulder line
+    title: 'Welt Chest Pocket',
+    description: 'Classic welt pocket perfectly positioned for your pocket square.',
+    details: ['Reinforced stitching', 'Traditional 10° angle', 'Hand-sewn edges'],
   },
   {
     id: 'buttons',
-    x: 50, // Center
-    y: 45, // Mid-torso where buttons are
+    x: 50, // Center of jacket
+    y: 42, // Mid-torso where front buttons are
     title: 'Corozo Buttons',
-    description: 'Natural tagua nut buttons for an elegant finish.',
-    details: ['Eco-friendly', 'Durable finish', 'Natural luster'],
+    description: 'Natural tagua nut buttons provide an elegant, eco-friendly finish.',
+    details: ['Sustainable material', 'Natural luster finish', 'Durable construction'],
   },
   {
     id: 'waist-pocket',
-    x: 25, // Left side
-    y: 55, // Waist level
+    x: 28, // Left side at waist
+    y: 52, // Waist level where flap pockets are
     title: 'Flap Pockets',
-    description: 'Functional flap pockets with hand-sewn details.',
-    details: ['Reinforced corners', 'Jetted option', 'Ticket pocket available'],
+    description: 'Functional flap pockets with hand-sewn jetting for clean lines.',
+    details: ['Reinforced corners', 'Jetted pocket option', 'Ticket pocket available'],
   },
   {
     id: 'fabric',
-    x: 60, // Right side
-    y: 50, // Torso area
-    title: 'Premium Fabric',
-    description: 'Italian wool sourced from the finest mills.',
-    details: ['Super 150s wool', 'Breathable weave', 'Wrinkle resistant'],
+    x: 65, // Right side of jacket
+    y: 38, // Mid-section showing fabric quality
+    title: 'Premium Italian Wool',
+    description: 'Super 150s Italian wool sourced from the finest mills.',
+    details: ['Super 150s wool', 'Breathable weave', 'Natural wrinkle resistance'],
   },
 ];
 
@@ -326,9 +326,9 @@ export default function MalipulaHome() {
   const [hasVisited, setHasVisited] = useState(false);
   const router = useRouter();
 
-  // Check if user has visited before
+  // Check if user has visited before (using localStorage for persistence)
   useEffect(() => {
-    const visited = sessionStorage.getItem('malipula_intro_shown');
+    const visited = localStorage.getItem('malipula_intro_shown_permanent');
     if (visited === 'true') {
       setHasVisited(true);
       setShowPreloader(false);
@@ -393,6 +393,20 @@ export default function MalipulaHome() {
             className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/10 to-transparent skew-x-12"
           />
 
+          {/* Secondary gold sweep - opposite direction */}
+          <motion.div
+            animate={{
+              x: ['200%', '-100%'],
+            }}
+            transition={{
+              duration: 12,
+              repeat: Infinity,
+              ease: 'linear',
+              delay: 2,
+            }}
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/5 to-transparent skew-x-[-12deg]"
+          />
+
           {/* Floating particles */}
           {[...Array(20)].map((_, i) => (
             <motion.div
@@ -414,6 +428,61 @@ export default function MalipulaHome() {
               className="absolute w-1 h-1 bg-gold rounded-full"
             />
           ))}
+
+          {/* Larger floating orbs */}
+          {[...Array(5)].map((_, i) => (
+            <motion.div
+              key={`orb-${i}`}
+              initial={{
+                x: `${20 + i * 15}%`,
+                y: `${30 + i * 10}%`,
+                scale: 0,
+                opacity: 0,
+              }}
+              animate={{
+                y: [`${30 + i * 10}%`, `${20 + i * 10}%`, `${30 + i * 10}%`],
+                scale: [0.8, 1, 0.8],
+                opacity: [0.1, 0.3, 0.1],
+              }}
+              transition={{
+                duration: 6 + i * 2,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                delay: i * 0.5,
+              }}
+              className="absolute w-32 h-32 md:w-48 md:h-48 rounded-full bg-gradient-to-br from-amber-500/10 to-transparent blur-3xl"
+            />
+          ))}
+
+          {/* Geometric decorative shapes */}
+          <motion.div
+            initial={{ opacity: 0, rotate: -45 }}
+            animate={{ opacity: 0.06, rotate: 0 }}
+            transition={{ duration: 2 }}
+            className="absolute -top-20 -right-20 w-80 h-80 border border-gold/30 rounded-full"
+          />
+          <motion.div
+            initial={{ opacity: 0, rotate: 45 }}
+            animate={{ opacity: 0.04, rotate: 0 }}
+            transition={{ duration: 2, delay: 0.3 }}
+            className="absolute -bottom-32 -left-32 w-96 h-96 border border-amber-500/20 rounded-full"
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 0.05, scale: 1 }}
+            transition={{ duration: 2, delay: 0.5 }}
+            className="absolute top-1/3 right-1/4 w-64 h-64 border border-gold/20 rotate-45"
+          />
+
+          {/* Diagonal line decorations */}
+          <div className="absolute inset-0 opacity-[0.03]">
+            <div className="absolute top-0 left-1/4 w-[1px] h-full bg-gradient-to-b from-transparent via-gold to-transparent" />
+            <div className="absolute top-0 left-2/4 w-[1px] h-full bg-gradient-to-b from-transparent via-gold to-transparent" />
+            <div className="absolute top-0 left-3/4 w-[1px] h-full bg-gradient-to-b from-transparent via-gold to-transparent" />
+          </div>
+
+          {/* Noise texture overlay */}
+          <div className="absolute inset-0 opacity-[0.02] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iMSIvPjwvc3ZnPg==')]" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 md:pt-32 pb-16 sm:pb-20">

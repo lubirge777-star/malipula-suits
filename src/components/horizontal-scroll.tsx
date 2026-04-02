@@ -1,9 +1,9 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 
-// Simple auto-playing feature cards carousel
+// Simple auto-playing feature cards carousel with scroll trigger
 interface FeatureCardsProps {
   sections: {
     id: string;
@@ -24,22 +24,36 @@ export function FeatureCards({
   autoPlayInterval = 5000 
 }: FeatureCardsProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
   const totalSlides = sections.length + 1; // +1 for CTA card
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Use Intersection Observer to detect when section is in view
+  const isInView = useInView(containerRef, { 
+    once: false, 
+    margin: '-20%' // Start when 20% of the section is visible
+  });
 
+  // Auto-play effect - starts when section is in view
   useEffect(() => {
+    if (!isInView) return;
+    
+    // Start the carousel when section comes into view
+    setHasStarted(true);
+    
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % totalSlides);
     }, autoPlayInterval);
 
     return () => clearInterval(timer);
-  }, [autoPlayInterval, totalSlides]);
+  }, [autoPlayInterval, totalSlides, isInView]);
 
   const goToSlide = (index: number) => {
     setCurrentIndex(index);
   };
 
   return (
-    <div className={`relative ${className}`}>
+    <div ref={containerRef} className={`relative ${className}`}>
       <div className="overflow-hidden">
         <motion.div
           animate={{ x: `-${currentIndex * 100}%` }}
