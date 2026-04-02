@@ -28,6 +28,7 @@ import { CinematicIntro } from '@/components/preloader';
 import { Marquee } from '@/components/marquee';
 import { WhatsAppButton } from '@/components/whatsapp-button';
 import { ServicesCarousel } from '@/components/services-carousel';
+import { TestimonialsCarousel } from '@/components/testimonials-carousel';
 import { ProductIndicators, FeatureCallout } from '@/components/product-indicators';
 import { ScrollReveal, ScrollProgress } from '@/components/scroll-animations';
 import { Navigation } from '@/components/navigation';
@@ -770,124 +771,225 @@ export default function MalipulaHome() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-12 sm:py-16 md:py-24 bg-background">
+      <section className="py-12 sm:py-16 md:py-24 bg-slate-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
             variants={fadeInUp}
-            className="text-center mb-8 sm:mb-12 md:mb-16"
+            className="text-center mb-8 sm:mb-12"
           >
             <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 mb-3 sm:mb-4 text-xs sm:text-sm">
               Testimonials
             </Badge>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3 sm:mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4">
               What Our <span className="text-gold-gradient">Clients Say</span>
             </h2>
+            <p className="text-sm sm:text-base text-gray-400 max-w-2xl mx-auto">
+              Hear from our valued customers about their experience with Malipula Suits
+            </p>
           </motion.div>
 
-          <motion.div
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-3 gap-4 sm:gap-6 md:gap-8"
-          >
-            {testimonials.map((testimonial) => (
-              <motion.div
-                key={testimonial.id}
-                variants={fadeInUp}
-                whileHover={{ y: -5 }}
-                className="bg-card rounded-xl sm:rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-2xl transition-shadow border border-amber-500/10"
-              >
-                <Quote className="w-8 h-8 sm:w-10 sm:h-10 text-amber-500/30 mb-3 sm:mb-4" />
-                <p className="text-sm sm:text-base text-foreground mb-4 sm:mb-6 leading-relaxed">
-                  {testimonial.content}
-                </p>
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <img
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full object-cover border-2 border-amber-500"
-                  />
-                  <div>
-                    <h4 className="font-semibold text-foreground text-sm sm:text-base">
-                      {testimonial.name}
-                    </h4>
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      {testimonial.role}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-0.5 sm:gap-1 mt-3 sm:mt-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400 fill-amber-400" />
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+          <TestimonialsCarousel autoPlayInterval={6000} />
         </div>
       </section>
 
       {/* CTA Section */}
       <section className="py-12 sm:py-16 md:py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800" />
-        <div className="absolute inset-0 pattern-bg opacity-10" />
-
+        {/* Background Effects */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
+        
+        {/* Animated Background Orbs */}
         <motion.div
-          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 5, repeat: Infinity }}
-          className="absolute top-0 right-0 w-64 sm:w-96 h-64 sm:h-96 bg-amber-500/20 rounded-full blur-3xl"
+          animate={{ 
+            scale: [1, 1.3, 1], 
+            opacity: [0.2, 0.4, 0.2],
+            x: [0, 50, 0],
+            y: [0, -30, 0],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-0 right-0 w-80 sm:w-[500px] h-80 sm:h-[500px] bg-amber-500/15 rounded-full blur-3xl"
         />
+        <motion.div
+          animate={{ 
+            scale: [1.3, 1, 1.3], 
+            opacity: [0.15, 0.3, 0.15],
+            x: [0, -30, 0],
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+          className="absolute bottom-0 left-0 w-80 sm:w-[400px] h-80 sm:h-[400px] bg-amber-400/10 rounded-full blur-3xl"
+        />
+        
+        {/* Floating geometric shapes */}
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
+          className="absolute top-1/4 right-1/4 w-32 h-32 border border-amber-500/10 rounded-full"
+        />
+        <motion.div
+          animate={{ rotate: -360 }}
+          transition={{ duration: 50, repeat: Infinity, ease: 'linear' }}
+          className="absolute bottom-1/4 left-1/4 w-24 h-24 border border-amber-400/10 rotate-45"
+        />
+        
+        {/* Particle effects */}
+        {[...Array(8)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute"
+            style={{
+              left: `${10 + i * 12}%`,
+              top: `${20 + (i % 4) * 20}%`,
+            }}
+            animate={{
+              y: [0, -30, 0],
+              opacity: [0.1, 0.4, 0.1],
+              scale: [1, 1.5, 1],
+            }}
+            transition={{
+              duration: 4 + i * 0.5,
+              repeat: Infinity,
+              delay: i * 0.3,
+            }}
+          >
+            <div className={`w-2 h-2 rounded-full ${i % 2 === 0 ? 'bg-amber-400/30' : 'bg-amber-300/20'}`} />
+          </motion.div>
+        ))}
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <motion.div
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
             variants={staggerContainer}
           >
+            {/* Animated Badge */}
             <motion.div variants={fadeInUp}>
-              <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 mb-4 sm:mb-6 text-xs sm:text-sm">
-                Limited Time Offer
-              </Badge>
+              <motion.div
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="inline-block"
+              >
+                <Badge className="bg-gradient-to-r from-amber-500/20 to-amber-600/20 text-amber-400 border-amber-500/30 mb-4 sm:mb-6 text-xs sm:text-sm backdrop-blur-sm px-4 py-2">
+                  <motion.span
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="inline-block mr-2"
+                  >
+                    ✨
+                  </motion.span>
+                  Limited Time Offer
+                </Badge>
+              </motion.div>
             </motion.div>
+            
+            {/* Animated Title */}
             <motion.h2
               variants={fadeInUp}
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight"
             >
-              Book Your <span className="text-gold-gradient">Free Consultation</span>
+              Book Your{' '}
+              <motion.span
+                className="text-gold-gradient inline-block"
+                animate={{ 
+                  backgroundPosition: ['0% center', '100% center', '0% center'],
+                }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+                style={{
+                  backgroundSize: '200% auto',
+                }}
+              >
+                Free Consultation
+              </motion.span>
             </motion.h2>
+            
+            {/* Animated Subtitle */}
             <motion.p
               variants={fadeInUp}
-              className="text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8 max-w-2xl mx-auto px-4 sm:px-0"
+              className="text-base sm:text-lg md:text-xl text-gray-300 mb-8 sm:mb-10 max-w-2xl mx-auto px-4 sm:px-0 leading-relaxed"
             >
               Schedule a personal fitting session with our master tailors and discover the Malipula difference.
             </motion.p>
+            
+            {/* CTA Buttons with Enhanced Effects */}
             <motion.div
               variants={fadeInUp}
-              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4 sm:px-0"
+              className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center px-4 sm:px-0"
             >
               <Link href="/booking" className="w-full sm:w-auto">
-                <Button
-                  size="lg"
-                  className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 font-semibold text-base sm:text-lg px-8 sm:px-10 py-5 sm:py-7 shadow-lg shadow-amber-500/25 transition-all duration-300"
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="relative group"
                 >
-                  Book Appointment
-                </Button>
+                  <Button
+                    size="lg"
+                    className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 font-bold text-base sm:text-lg px-10 sm:px-12 py-6 sm:py-8 shadow-2xl shadow-amber-500/30 transition-all duration-300 rounded-2xl relative overflow-hidden"
+                  >
+                    <span className="relative z-10 flex items-center justify-center gap-2">
+                      <motion.span
+                        animate={{ rotate: [0, 360] }}
+                        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+                      >
+                        <Crown className="w-5 h-5 sm:w-6 sm:h-6" />
+                      </motion.span>
+                      Book Appointment
+                      <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                    {/* Shine effect */}
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12"
+                      animate={{ x: ['-200%', '200%'] }}
+                      transition={{ duration: 3, repeat: Infinity, repeatDelay: 2, ease: 'linear' }}
+                    />
+                  </Button>
+                </motion.div>
               </Link>
+              
               <a href="tel:+255654321987" className="w-full sm:w-auto">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="w-full sm:w-auto border-2 border-amber-500/50 text-amber-400 hover:bg-amber-500 hover:text-slate-900 hover:border-amber-500 font-semibold text-base sm:text-lg px-8 sm:px-10 py-5 sm:py-7 transition-all duration-300"
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <Phone className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                  Call Us Now
-                </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="w-full sm:w-auto border-2 border-amber-500/40 text-amber-400 hover:bg-amber-500 hover:text-slate-900 hover:border-amber-500 font-semibold text-base sm:text-lg px-10 sm:px-12 py-6 sm:py-8 transition-all duration-300 backdrop-blur-sm rounded-2xl bg-white/5"
+                  >
+                    <motion.span
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <Phone className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+                    </motion.span>
+                    Call Us Now
+                  </Button>
+                </motion.div>
               </a>
+            </motion.div>
+            
+            {/* Trust Indicators */}
+            <motion.div
+              variants={fadeInUp}
+              className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 mt-10 sm:mt-12 text-gray-400 text-xs sm:text-sm"
+            >
+              {[
+                { icon: Shield, text: '100% Satisfaction' },
+                { icon: Truck, text: 'Free Delivery' },
+                { icon: Award, text: 'Award Winning' },
+              ].map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 + index * 0.1 }}
+                  className="flex items-center gap-2"
+                >
+                  <item.icon className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400/70" />
+                  <span>{item.text}</span>
+                </motion.div>
+              ))}
             </motion.div>
           </motion.div>
         </div>
