@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import Link from 'next/link';
 import {
@@ -14,6 +14,7 @@ import {
   Crown,
   Sparkles,
   Loader2,
+  X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -292,6 +293,107 @@ export default function ShopPage() {
                   <p className="text-muted-foreground">Loading products...</p>
                 </div>
               )}
+
+              {/* Mobile Filter Panel */}
+              <AnimatePresence>
+                {showFilters && (
+                  <>
+                    {/* Backdrop */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      onClick={() => setShowFilters(false)}
+                      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+                    />
+                    
+                    {/* Filter Panel */}
+                    <motion.div
+                      initial={{ x: '-100%' }}
+                      animate={{ x: 0 }}
+                      exit={{ x: '-100%' }}
+                      transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                      className="fixed top-0 left-0 bottom-0 w-80 max-w-[85vw] bg-background border-r border-gold/10 z-50 lg:hidden overflow-y-auto"
+                    >
+                      <div className="p-6">
+                        <div className="flex items-center justify-between mb-6">
+                          <h3 className="text-lg font-semibold text-foreground">Filters</h3>
+                          <button
+                            onClick={() => setShowFilters(false)}
+                            className="p-2 hover:bg-muted rounded-full transition-colors"
+                          >
+                            <X className="w-5 h-5" />
+                          </button>
+                        </div>
+
+                        {/* Search */}
+                        <div className="relative mb-6">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                          <Input 
+                            type="text" 
+                            placeholder="Search products..." 
+                            value={searchQuery} 
+                            onChange={(e) => setSearchQuery(e.target.value)} 
+                            className="pl-10 border-gold/20 focus:border-gold" 
+                          />
+                        </div>
+
+                        {/* Categories */}
+                        <div className="mb-6">
+                          <h4 className="font-medium text-foreground mb-3">Categories</h4>
+                          <div className="space-y-2">
+                            <motion.button
+                              whileHover={{ x: 5 }}
+                              onClick={() => setSelectedCategory('all')}
+                              className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                                selectedCategory === 'all' ? 'bg-gold text-charcoal font-medium' : 'hover:bg-muted text-muted-foreground hover:text-foreground'
+                              }`}
+                            >
+                              All Products
+                            </motion.button>
+                            {categoriesLoading ? (
+                              <div className="flex justify-center py-4">
+                                <Loader2 className="w-5 h-5 animate-spin text-gold" />
+                              </div>
+                            ) : (
+                              categories.map((category: Category) => (
+                                <motion.button
+                                  key={category.id}
+                                  whileHover={{ x: 5 }}
+                                  onClick={() => setSelectedCategory(category.slug)}
+                                  className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                                    selectedCategory === category.slug ? 'bg-gold text-charcoal font-medium' : 'hover:bg-muted text-muted-foreground hover:text-foreground'
+                                  }`}
+                                >
+                                  {category.name}
+                                </motion.button>
+                              ))
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Price Range */}
+                        <div className="mb-6">
+                          <h4 className="font-medium text-foreground mb-3">Price Range</h4>
+                          <Slider value={priceRange} onValueChange={setPriceRange} max={1500000} step={50000} className="mb-4" />
+                          <div className="flex justify-between text-sm text-muted-foreground">
+                            <span>TZS {formatPrice(priceRange[0])}</span>
+                            <span>TZS {formatPrice(priceRange[1])}</span>
+                          </div>
+                        </div>
+
+                        {/* Apply Button */}
+                        <Button 
+                          onClick={() => setShowFilters(false)}
+                          className="w-full bg-gold hover:bg-gold-dark text-charcoal font-semibold"
+                        >
+                          Apply Filters
+                        </Button>
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
 
               {/* Error State */}
               {productsError && (

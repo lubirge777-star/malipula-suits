@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Info } from 'lucide-react';
 
@@ -28,6 +28,43 @@ export function ProductIndicators({
   className = '',
 }: ProductIndicatorsProps) {
   const [activeIndicator, setActiveIndicator] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Close on escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setActiveIndicator(null);
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, []);
+
+  // Get current indicator data
+  const currentIndicator = indicators.find(i => i.id === activeIndicator);
+
+  // Calculate popup position for desktop
+  const getPopupStyle = (indicator: IndicatorPoint) => {
+    if (isMobile) return {};
+    
+    return {
+      left: indicator.x > 60 ? 'auto' : '50%',
+      right: indicator.x > 60 ? '50%' : 'auto',
+      marginLeft: indicator.x > 60 ? 0 : 24,
+      marginRight: indicator.x > 60 ? 24 : 0,
+      top: '50%',
+      transform: 'translateY(-50%)',
+    };
+  };
 
   return (
     <div className={`relative ${className}`}>
@@ -53,7 +90,7 @@ export function ProductIndicators({
               transform: 'translate(-50%, -50%)',
             }}
           >
-            {/* Indicator button - MUCH LARGER */}
+            {/* Indicator button - responsive sizing */}
             <motion.button
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -85,23 +122,16 @@ export function ProductIndicators({
               )}
             </motion.button>
 
-            {/* Popup content */}
+            {/* Desktop popup content */}
             <AnimatePresence>
-              {activeIndicator === indicator.id && (
+              {activeIndicator === indicator.id && !isMobile && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9, y: 10 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.9, y: 10 }}
                   transition={{ duration: 0.2 }}
                   className="absolute z-30 w-72 bg-white rounded-2xl shadow-2xl p-5"
-                  style={{
-                    left: indicator.x > 60 ? 'auto' : '50%',
-                    right: indicator.x > 60 ? '50%' : 'auto',
-                    marginLeft: indicator.x > 60 ? 0 : 24,
-                    marginRight: indicator.x > 60 ? 24 : 0,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                  }}
+                  style={getPopupStyle(indicator) as React.CSSProperties}
                 >
                   <button
                     onClick={(e) => {
@@ -144,12 +174,70 @@ export function ProductIndicators({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1 }}
-          className="absolute bottom-4 left-4 flex items-center gap-2 px-4 py-2.5 bg-charcoal/60 backdrop-blur-sm rounded-full text-white text-sm"
+          className="absolute bottom-4 left-4 flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-charcoal/60 backdrop-blur-sm rounded-full text-white text-xs sm:text-sm"
         >
-          <Info className="w-4 h-4" />
-          <span>Tap the <span className="font-semibold text-gold">+</span> points to explore details</span>
+          <Info className="w-3 h-3 sm:w-4 sm:h-4" />
+          <span>Tap <span className="font-semibold text-gold">+</span> to explore</span>
         </motion.div>
       </div>
+
+      {/* Mobile Modal Popup */}
+      <AnimatePresence>
+        {activeIndicator && isMobile && currentIndicator && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setActiveIndicator(null)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            />
+            
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl p-6 max-h-[70vh] overflow-y-auto"
+            >
+              {/* Handle bar */}
+              <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
+              
+              {/* Close button */}
+              <button
+                onClick={() => setActiveIndicator(null)}
+                className="absolute top-4 right-4 p-2 hover:bg-muted rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Content */}
+              <h4 className="font-bold text-charcoal text-xl mb-2 pr-8">
+                {currentIndicator.title}
+              </h4>
+              <p className="text-sm text-muted-foreground mb-4">
+                {currentIndicator.description}
+              </p>
+
+              {currentIndicator.details && (
+                <ul className="space-y-3">
+                  {currentIndicator.details.map((detail, i) => (
+                    <li
+                      key={i}
+                      className="flex items-center gap-3 text-sm text-charcoal/70"
+                    >
+                      <span className="w-2 h-2 rounded-full bg-gold flex-shrink-0" />
+                      {detail}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -190,7 +278,7 @@ export function FeatureCallout({ features, layout = 'grid' }: FeatureCalloutProp
   }
 
   return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       {features.map((feature, index) => (
         <motion.div
           key={index}
@@ -198,13 +286,13 @@ export function FeatureCallout({ features, layout = 'grid' }: FeatureCalloutProp
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
           whileHover={{ y: -5 }}
-          className="p-6 bg-card rounded-2xl border border-gold/10 hover:border-gold/30 transition-all hover:shadow-lg hover:shadow-gold/5"
+          className="p-4 sm:p-6 bg-card rounded-2xl border border-gold/10 hover:border-gold/30 transition-all hover:shadow-lg hover:shadow-gold/5"
         >
-          <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center text-gold mb-4">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gold/10 flex items-center justify-center text-gold mb-3 sm:mb-4">
             {feature.icon}
           </div>
-          <h4 className="font-semibold text-foreground mb-2">{feature.title}</h4>
-          <p className="text-sm text-muted-foreground">{feature.description}</p>
+          <h4 className="font-semibold text-foreground text-sm sm:text-base mb-1 sm:mb-2">{feature.title}</h4>
+          <p className="text-xs sm:text-sm text-muted-foreground">{feature.description}</p>
         </motion.div>
       ))}
     </div>
@@ -237,7 +325,7 @@ export function ComparisonSlider({
 
   return (
     <div
-      className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden cursor-ew-resize select-none"
+      className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] rounded-2xl overflow-hidden cursor-ew-resize select-none"
       onMouseDown={() => setIsDragging(true)}
       onMouseUp={() => setIsDragging(false)}
       onMouseLeave={() => setIsDragging(false)}
@@ -275,7 +363,7 @@ export function ComparisonSlider({
         style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
       >
         {/* Handle circle */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full shadow-lg flex items-center justify-center">
           <div className="flex gap-1">
             <div className="w-0.5 h-4 bg-charcoal rounded-full" />
             <div className="w-0.5 h-4 bg-charcoal rounded-full" />
@@ -284,10 +372,10 @@ export function ComparisonSlider({
       </div>
 
       {/* Labels */}
-      <div className="absolute bottom-4 left-4 px-3 py-1.5 bg-black/50 backdrop-blur-sm rounded-full text-white text-sm">
+      <div className="absolute bottom-4 left-4 px-3 py-1.5 bg-black/50 backdrop-blur-sm rounded-full text-white text-xs sm:text-sm">
         {label.before}
       </div>
-      <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/50 backdrop-blur-sm rounded-full text-white text-sm">
+      <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/50 backdrop-blur-sm rounded-full text-white text-xs sm:text-sm">
         {label.after}
       </div>
     </div>

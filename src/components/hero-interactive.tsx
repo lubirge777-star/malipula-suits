@@ -3,7 +3,7 @@
 import { motion, useMotionValue, useSpring, useTransform, useInView } from 'framer-motion';
 import { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ShoppingBag, Play, ArrowRight, Crown, Star, Scissors, Sparkles } from 'lucide-react';
+import { ShoppingBag, Play, ArrowRight, Crown, Star, Scissors, Sparkles, Award, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
@@ -16,7 +16,6 @@ function useMouseParallax(strength: number = 1) {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    // Check if mobile device
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window);
     };
@@ -26,10 +25,10 @@ function useMouseParallax(strength: number = 1) {
   }, []);
 
   useEffect(() => {
-    if (isMobile) return; // Disable on mobile
+    if (isMobile) return;
     
     const handleMouseMove = (e: MouseEvent) => {
-      const { clientX, clientY } = e;
+      const { clientX, clientY } = window;
       const { innerWidth, innerHeight } = window;
       mouseX.set((clientX - innerWidth / 2) / innerWidth * strength);
       mouseY.set((clientY - innerHeight / 2) / innerHeight * strength);
@@ -254,23 +253,25 @@ function TiltCard({ children, className = '', glareEnabled = true }: TiltCardPro
 }
 
 // ============================================
-// 6. FLOATING PARTICLES (Subtle)
+// 6. FLOATING PARTICLES - Enhanced for Mobile
 // ============================================
-function FloatingParticles() {
+function FloatingParticles({ isMobile = false }: { isMobile?: boolean }) {
+  const particleCount = isMobile ? 8 : 12;
+  
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {[...Array(12)].map((_, i) => (
+      {[...Array(particleCount)].map((_, i) => (
         <motion.div
           key={i}
           className="absolute"
           style={{
-            left: `${10 + i * 7}%`,
+            left: `${10 + i * (isMobile ? 10 : 7)}%`,
             top: `${15 + (i % 4) * 20}%`,
           }}
           animate={{
-            y: [0, -15, 0],
-            opacity: [0.2, 0.6, 0.2],
-            scale: [1, 1.3, 1],
+            y: [0, isMobile ? -10 : -15, 0],
+            opacity: [0.3, 0.7, 0.3],
+            scale: [1, 1.4, 1],
           }}
           transition={{
             duration: 3 + i * 0.4,
@@ -279,7 +280,7 @@ function FloatingParticles() {
             ease: 'easeInOut',
           }}
         >
-          <div className={`w-1 h-1 rounded-full ${i % 2 === 0 ? 'bg-amber-400/60' : 'bg-amber-300/40'}`} />
+          <div className={`rounded-full ${i % 2 === 0 ? 'bg-amber-400/50' : 'bg-amber-300/30'} ${isMobile ? 'w-1.5 h-1.5' : 'w-1 h-1'}`} />
         </motion.div>
       ))}
     </div>
@@ -287,11 +288,65 @@ function FloatingParticles() {
 }
 
 // ============================================
-// 7. ELEGANT DECORATIVE ELEMENTS
+// 7. MOBILE DECORATIVE ELEMENTS - Beautiful & Engaging
 // ============================================
-function DecorativeElements() {
+function MobileDecorativeElements() {
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+    <div className="absolute inset-0 pointer-events-none overflow-hidden sm:hidden">
+      {/* Animated gradient orbs */}
+      <motion.div
+        animate={{ 
+          scale: [1, 1.2, 1],
+          opacity: [0.15, 0.25, 0.15],
+        }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute top-20 -right-20 w-60 h-60 bg-amber-500/20 rounded-full blur-3xl"
+      />
+      <motion.div
+        animate={{ 
+          scale: [1.2, 1, 1.2],
+          opacity: [0.1, 0.2, 0.1],
+        }}
+        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+        className="absolute bottom-40 -left-20 w-50 h-50 bg-amber-400/15 rounded-full blur-3xl"
+      />
+      
+      {/* Floating geometric shapes */}
+      <motion.div
+        animate={{ 
+          y: [0, -20, 0],
+          rotate: [0, 180, 360],
+        }}
+        transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+        className="absolute top-1/4 right-8 w-6 h-6 border border-amber-500/20 rotate-45"
+      />
+      <motion.div
+        animate={{ 
+          y: [0, 15, 0],
+          rotate: [0, -180, -360],
+        }}
+        transition={{ duration: 10, repeat: Infinity, ease: 'linear', delay: 2 }}
+        className="absolute bottom-1/3 left-6 w-4 h-4 border border-amber-400/15 rounded-full"
+      />
+      
+      {/* Gold shimmer line */}
+      <motion.div
+        animate={{ 
+          x: ['-100%', '200%'],
+        }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'linear', delay: 1 }}
+        className="absolute top-1/2 left-0 w-1/3 h-[1px] bg-gradient-to-r from-transparent via-amber-500/30 to-transparent"
+      />
+    </div>
+  );
+}
+
+// ============================================
+// 8. DESKTOP DECORATIVE ELEMENTS
+// ============================================
+function DesktopDecorativeElements() {
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden hidden sm:block">
       {/* Subtle rotating circle - top right */}
       <motion.div
         animate={{ rotate: 360 }}
@@ -318,29 +373,116 @@ function DecorativeElements() {
 }
 
 // ============================================
-// 8. SCROLL INDICATOR
+// 9. SCROLL INDICATOR - Enhanced
 // ============================================
-function ScrollIndicator() {
+function ScrollIndicator({ isMobile = false }: { isMobile?: boolean }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 2 }}
-      className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+      className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
     >
       <motion.div
-        animate={{ y: [0, 8, 0] }}
+        animate={{ y: [0, isMobile ? 6 : 8, 0] }}
         transition={{ duration: 1.5, repeat: Infinity }}
         className="flex flex-col items-center gap-2"
       >
-        <span className="text-white/40 text-xs tracking-widest uppercase">Scroll</span>
-        <div className="w-5 h-8 border border-amber-500/30 rounded-full flex justify-center pt-1.5">
+        {!isMobile && (
+          <span className="text-white/40 text-xs tracking-widest uppercase">Scroll</span>
+        )}
+        <div className={`w-5 h-8 sm:h-8 border border-amber-500/30 rounded-full flex justify-center pt-1.5 ${isMobile ? 'backdrop-blur-sm bg-charcoal/30' : ''}`}>
           <motion.div
             animate={{ y: [0, 10, 0], opacity: [1, 0.3, 1] }}
             transition={{ duration: 1.5, repeat: Infinity }}
             className="w-1 h-2 bg-amber-400/70 rounded-full"
           />
         </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// ============================================
+// 10. MOBILE STATS CARD - Beautiful compact design
+// ============================================
+function MobileStatsCard({ stats }: { stats: { label: string; value: string; numericValue?: number }[] }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 1.2 }}
+      className="sm:hidden mt-8"
+    >
+      <div className="relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl rounded-2xl p-5 border border-white/10">
+        {/* Decorative corner */}
+        <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-amber-500/10 to-transparent rounded-tr-2xl" />
+        
+        <div className="grid grid-cols-2 gap-4">
+          {stats.slice(0, 4).map((stat, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 1.4 + index * 0.1 }}
+              className="relative text-center py-2"
+            >
+              <div className="text-xl font-bold text-gold-gradient">
+                {stat.numericValue ? (
+                  <AnimatedCounter 
+                    value={stat.numericValue} 
+                    suffix={stat.value.replace(/[0-9,]/g, '')} 
+                  />
+                ) : (
+                  stat.value
+                )}
+              </div>
+              <div className="text-[10px] text-gray-400 mt-0.5 uppercase tracking-wide">{stat.label}</div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ============================================
+// 11. MOBILE FLOATING BRAND ELEMENT
+// ============================================
+function MobileBrandElement() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: 0.8, duration: 0.5 }}
+      className="absolute top-24 right-4 sm:hidden"
+    >
+      <motion.div
+        animate={{ y: [0, -5, 0] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+        className="relative"
+      >
+        <div className="bg-charcoal/60 backdrop-blur-xl rounded-2xl p-3 border border-amber-500/20 shadow-lg shadow-amber-500/5">
+          <motion.div
+            animate={{ rotate: [0, 5, -5, 0] }}
+            transition={{ duration: 4, repeat: Infinity }}
+          >
+            <img
+              src="/images/malipula/m.png"
+              alt="Malipula"
+              className="w-12 h-12 object-contain"
+            />
+          </motion.div>
+        </div>
+        
+        {/* Floating badge */}
+        <motion.div
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="absolute -bottom-2 -right-2 bg-gradient-to-r from-amber-500 to-amber-600 rounded-full px-2 py-0.5 shadow-lg"
+        >
+          <span className="text-[8px] font-bold text-charcoal">EAGMA 2025</span>
+        </motion.div>
       </motion.div>
     </motion.div>
   );
@@ -361,7 +503,6 @@ export function InteractiveHeroSection({
     { label: 'Award Winning', value: '2025' },
   ]
 }: InteractiveHeroSectionProps) {
-  // Very subtle parallax - only 5px movement max, disabled on mobile
   const { mouseX, mouseY, isMobile } = useMouseParallax(1);
   const backgroundX = useSpring(useTransform(mouseX, (v) => v * 5), { stiffness: 100, damping: 30 });
   const backgroundY = useSpring(useTransform(mouseY, (v) => v * 5), { stiffness: 100, damping: 30 });
@@ -370,9 +511,8 @@ export function InteractiveHeroSection({
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-charcoal">
-      {/* Background Image - Fixed position, no white space issue */}
+      {/* Background Image */}
       <div className="absolute inset-0">
-        {/* Only apply parallax on desktop */}
         {!isMobile && (
           <motion.div
             className="absolute inset-[-20px]"
@@ -385,7 +525,6 @@ export function InteractiveHeroSection({
             />
           </motion.div>
         )}
-        {/* Static background for mobile */}
         {isMobile && (
           <img
             src="/images/malipula/hero.jpg"
@@ -393,22 +532,29 @@ export function InteractiveHeroSection({
             className="absolute inset-0 w-full h-full object-cover object-center"
           />
         )}
-        {/* Dark gradient overlay - covers entire screen */}
-        <div className="absolute inset-0 bg-gradient-to-r from-charcoal/97 via-charcoal/90 to-charcoal/75" />
-        {/* Mobile gradient - more centered */}
-        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/50 via-transparent to-charcoal/60 sm:hidden" />
+        
+        {/* Gradient Overlays - Mobile optimized */}
+        <div className="absolute inset-0 bg-gradient-to-r from-charcoal/[0.97] via-charcoal/90 to-charcoal/75 hidden sm:block" />
+        
+        {/* Mobile gradient - darker and from bottom for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/80 to-charcoal/60 sm:hidden" />
+        
+        {/* Mobile side vignette */}
+        <div className="absolute inset-0 bg-gradient-to-r from-charcoal/40 via-transparent to-charcoal/40 sm:hidden" />
       </div>
 
-      {/* Floating Particles - fewer on mobile */}
-      <FloatingParticles />
+      {/* Floating Particles */}
+      <FloatingParticles isMobile={isMobile} />
 
-      {/* Decorative Elements - hidden on mobile */}
-      <div className="hidden sm:block">
-        <DecorativeElements />
-      </div>
+      {/* Decorative Elements */}
+      <MobileDecorativeElements />
+      <DesktopDecorativeElements />
+
+      {/* Mobile Brand Element - Top Right */}
+      <MobileBrandElement />
 
       {/* Main Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-28 md:pt-32 lg:pt-36 pb-16 sm:pb-20">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-28 md:pt-32 lg:pt-36 pb-20 sm:pb-20">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left Content */}
           <motion.div
@@ -417,14 +563,14 @@ export function InteractiveHeroSection({
             transition={{ duration: 0.8 }}
             className="text-center lg:text-left"
           >
-            {/* Badge */}
+            {/* Badge - Mobile optimized */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3 }}
               className="mb-4 sm:mb-6"
             >
-              <Badge className="bg-gold/15 text-gold border-gold/25 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm backdrop-blur-sm">
+              <Badge className="bg-gold/15 text-gold border-gold/25 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm backdrop-blur-sm inline-flex items-center">
                 <motion.div
                   animate={{ rotate: [0, 10, -10, 0] }}
                   transition={{ duration: 2, repeat: Infinity }}
@@ -435,55 +581,92 @@ export function InteractiveHeroSection({
               </Badge>
             </motion.div>
 
-            {/* Main Heading - responsive sizing */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+            {/* Main Heading - Mobile optimized with staggered animation */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight mb-4 sm:mb-6"
             >
-              Royal.{' '}
-              <span className="text-gold-gradient">Rooted.</span>
-              <br />
-              <span className="text-white/90">Refined.</span>
-            </motion.h1>
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight mb-3 sm:mb-6"
+              >
+                <motion.span
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className="inline-block"
+                >
+                  Royal.
+                </motion.span>{' '}
+                <motion.span
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.7 }}
+                  className="inline-block text-gold-gradient"
+                >
+                  Rooted.
+                </motion.span>
+                <br />
+                <motion.span
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.8 }}
+                  className="inline-block text-white/90"
+                >
+                  Refined.
+                </motion.span>
+              </motion.h1>
+            </motion.div>
 
             {/* Typewriter Tagline */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              className="text-base sm:text-lg md:text-xl text-amber-400 mb-3 sm:mb-4 h-6 sm:h-8"
+              transition={{ delay: 1 }}
+              className="text-base sm:text-lg md:text-xl text-amber-400 mb-4 sm:mb-4 h-7 sm:h-8"
             >
               <TypewriterText words={typewriterWords} className="font-light" />
             </motion.div>
 
-            {/* Description */}
+            {/* Description - Hidden on very small screens, shown on larger */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="text-sm sm:text-base md:text-lg text-gray-300 mb-6 sm:mb-8 max-w-lg mx-auto lg:mx-0 px-2 sm:px-0"
+              transition={{ delay: 1.1 }}
+              className="hidden sm:block text-sm sm:text-base md:text-lg text-gray-300 mb-6 sm:mb-8 max-w-lg mx-auto lg:mx-0"
             >
               Where craftsmanship meets elegance, and tradition blends seamlessly with modern style.
               Experience exceptional tailoring from the heart of Dar es Salaam.
             </motion.p>
 
-            {/* CTA Buttons - full width on mobile */}
+            {/* Mobile Short Description */}
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.1 }}
+              className="sm:hidden text-sm text-gray-300 mb-6 px-2"
+            >
+              Experience exceptional tailoring from the heart of Dar es Salaam.
+            </motion.p>
+
+            {/* CTA Buttons - Mobile optimized */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
+              transition={{ delay: 1.2 }}
               className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start px-2 sm:px-0"
             >
               <MagneticButton href="/shop" strength={0.15}>
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 font-semibold text-sm sm:text-base md:text-lg px-6 sm:px-8 py-5 sm:py-6 shadow-lg shadow-amber-500/20 transition-all duration-300 group"
+                  className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 font-semibold text-base sm:text-base md:text-lg px-8 sm:px-8 py-6 sm:py-6 shadow-lg shadow-amber-500/25 transition-all duration-300 group rounded-xl"
                 >
-                  <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 mr-2 group-hover:scale-110 transition-transform" />
+                  <ShoppingBag className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
                   Shop Collection
-                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </MagneticButton>
 
@@ -491,20 +674,20 @@ export function InteractiveHeroSection({
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto border-2 border-amber-500/40 text-amber-400 hover:bg-amber-500 hover:text-slate-900 hover:border-amber-500 font-semibold text-sm sm:text-base md:text-lg px-6 sm:px-8 py-5 sm:py-6 transition-all duration-300 backdrop-blur-sm"
+                  className="w-full sm:w-auto border-2 border-amber-500/40 text-amber-400 hover:bg-amber-500 hover:text-slate-900 hover:border-amber-500 font-semibold text-base sm:text-base md:text-lg px-8 sm:px-8 py-6 sm:py-6 transition-all duration-300 backdrop-blur-sm rounded-xl"
                 >
-                  <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  <Play className="w-5 h-5 mr-2" />
                   Book Fitting
                 </Button>
               </MagneticButton>
             </motion.div>
 
-            {/* Animated Stats - 2x2 grid on mobile, 4 columns on larger */}
+            {/* Desktop Stats */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1 }}
-              className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 mt-8 sm:mt-10 md:mt-12 pt-6 sm:pt-8 border-t border-white/10"
+              transition={{ delay: 1.4 }}
+              className="hidden sm:grid grid-cols-4 gap-6 mt-10 md:mt-12 pt-8 border-t border-white/10"
             >
               {stats.map((stat, index) => (
                 <motion.div
@@ -512,9 +695,9 @@ export function InteractiveHeroSection({
                   className="text-center py-2"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 1.2 + index * 0.1 }}
+                  transition={{ delay: 1.6 + index * 0.1 }}
                 >
-                  <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gold-gradient">
+                  <div className="text-xl md:text-2xl lg:text-3xl font-bold text-gold-gradient">
                     {stat.numericValue ? (
                       <AnimatedCounter 
                         value={stat.numericValue} 
@@ -524,13 +707,13 @@ export function InteractiveHeroSection({
                       stat.value
                     )}
                   </div>
-                  <div className="text-xs sm:text-sm text-gray-400 mt-0.5 sm:mt-1">{stat.label}</div>
+                  <div className="text-xs sm:text-sm text-gray-400 mt-1">{stat.label}</div>
                 </motion.div>
               ))}
             </motion.div>
           </motion.div>
 
-          {/* Right Content - Brand Card (hidden on mobile, shown on tablet+) */}
+          {/* Right Content - Brand Card (Desktop only) */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -592,13 +775,16 @@ export function InteractiveHeroSection({
             </TiltCard>
           </motion.div>
         </div>
+
+        {/* Mobile Stats Card - Below content */}
+        <MobileStatsCard stats={stats} />
       </div>
 
       {/* Scroll Indicator */}
-      <ScrollIndicator />
+      <ScrollIndicator isMobile={isMobile} />
 
       {/* Bottom gradient for smooth section transition */}
-      <div className="absolute bottom-0 left-0 right-0 h-20 sm:h-24 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-24 sm:h-24 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none" />
     </section>
   );
 }
