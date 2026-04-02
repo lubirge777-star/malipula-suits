@@ -1,0 +1,3 @@
+export { createClient, getSupabaseClient } from './client';
+export { createClient as createServerClient, createAdminClient } from './server';
+export type { Database, User, Category, Fabric, Product, ProductItem, CartItem, Order, OrderItem, Appointment, Measurement, Address, Review, Wishlist, Promotion, InsertUser, InsertCategory, InsertFabric, InsertProduct, InsertProductItem, InsertCartItem, InsertOrder, InsertOrderItem, InsertAppointment, InsertMeasurement, InsertAddress, InsertReview, InsertWishlist, InsertPromotion, UserRole, ProductType, FabricQuality, FitType, OrderStatus, PaymentStatus, PaymentMethod, DeliveryMethod, DeliveryStatus, ProductionStatus, AppointmentType, AppointmentStatus, DiscountType, } from './types';
