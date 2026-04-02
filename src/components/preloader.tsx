@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface CinematicIntroProps {
@@ -54,6 +54,9 @@ const phases = [
 // Calculate total duration
 const TOTAL_DURATION = phases.reduce((acc, p) => acc + p.duration, 0);
 
+// Local storage key for tracking if intro was shown
+const INTRO_SHOWN_KEY = 'malipula_intro_shown';
+
 // Cinematic intro with visuals and animations
 export function CinematicIntro({ 
   onComplete,
@@ -62,23 +65,30 @@ export function CinematicIntro({
   const [isComplete, setIsComplete] = useState(false);
   const [showImage, setShowImage] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [shouldShow, setShouldShow] = useState(false);
   
   // Use refs to prevent multiple completions
-  const hasCompleted = useRef(false);
-  const onCompleteRef = useRef(onComplete);
+  const hasCompleted = false;
+  const onCompleteRef = useCallback(onComplete, []);
   
   // Keep ref updated
   useEffect(() => {
-    onCompleteRef.current = onComplete;
-  }, [onComplete]);
-
-  useEffect(() => {
     setMounted(true);
-  }, []);
+    
+    // Check if intro was already shown in this session
+    const introShown = sessionStorage.getItem(INTRO_SHOWN_KEY);
+    if (introShown === 'true') {
+      // Already shown, skip intro
+      setIsComplete(true);
+      onComplete?.();
+    } else {
+      setShouldShow(true);
+    }
+  }, [onComplete]);
 
   // Main timing effect - only runs once
   useEffect(() => {
-    if (hasCompleted.current) return;
+    if (!shouldShow) return;
 
     const timers: ReturnType<typeof setTimeout>[] = [];
     let elapsedTime = 0;
@@ -106,18 +116,19 @@ export function CinematicIntro({
 
     // Final completion timer
     const completeTimer = setTimeout(() => {
-      if (!hasCompleted.current) {
-        hasCompleted.current = true;
-        setIsComplete(true);
-        onCompleteRef.current?.();
-      }
+      sessionStorage.setItem(INTRO_SHOWN_KEY, 'true');
+      setIsComplete(true);
+      onComplete?.();
     }, TOTAL_DURATION + 800);
     timers.push(completeTimer);
 
     return () => {
       timers.forEach(timer => clearTimeout(timer));
     };
-  }, []); // Empty dependency array - only runs once
+  }, [shouldShow, onComplete]);
+
+  // Don't render anything if already shown or not mounted
+  if (!mounted || !shouldShow) return null;
 
   return (
     <AnimatePresence>
@@ -221,12 +232,6 @@ export function CinematicIntro({
             transition={{ duration: 2.5, delay: 0.3 }}
             className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] border border-gold rounded-full"
           />
-          <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 0.03, scale: 1 }}
-            transition={{ duration: 3, delay: 0.5 }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-gold rounded-full"
-          />
 
           {/* Animated horizontal line */}
           <motion.div
@@ -262,13 +267,13 @@ export function CinematicIntro({
           ))}
 
           {/* Main content container */}
-          <div className="relative z-10 h-full flex flex-col items-center justify-center px-8">
+          <div className="relative z-10 h-full flex flex-col items-center justify-center px-4 sm:px-8">
             {/* Animated logo mark */}
             <motion.div
               initial={{ scale: 0, rotate: -180, opacity: 0 }}
               animate={{ scale: 1, rotate: 0, opacity: 1 }}
               transition={{ duration: 1.2, type: 'spring', stiffness: 100, delay: 0.3 }}
-              className="mb-12"
+              className="mb-8 md:mb-12"
             >
               <div className="relative">
                 {/* Outer rotating ring */}
@@ -285,17 +290,11 @@ export function CinematicIntro({
                   className="absolute inset-0 w-24 h-24 md:w-32 md:h-32 border border-gold/25 rounded-full"
                   style={{ left: -4, top: -4 }}
                 />
-                {/* Innermost rotating ring */}
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-                  className="absolute inset-0 w-20 h-20 md:w-24 md:h-24 border border-gold/15 rounded-full"
-                />
                 {/* Logo */}
                 <motion.img
                   src="/images/malipula/m.png"
                   alt="Malipula"
-                  className="relative w-20 h-20 md:w-28 md:h-28 object-contain"
+                  className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 object-contain"
                   animate={{ 
                     filter: ['drop-shadow(0 0 10px rgba(212, 175, 55, 0.3))', 'drop-shadow(0 0 25px rgba(212, 175, 55, 0.6))', 'drop-shadow(0 0 10px rgba(212, 175, 55, 0.3))']
                   }}
@@ -316,7 +315,7 @@ export function CinematicIntro({
               >
                 {/* Main text with word animation */}
                 <div className="overflow-hidden mb-4">
-                  <motion.p className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-light text-white tracking-wide leading-tight">
+                  <motion.p className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-light text-white tracking-wide leading-tight">
                     {phases[currentPhase].text.split(' ').map((word, wordIndex) => (
                       <motion.span
                         key={wordIndex}
@@ -342,19 +341,19 @@ export function CinematicIntro({
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5, duration: 1 }}
-                    className="flex flex-col items-center mt-10"
+                    className="flex flex-col items-center mt-6 md:mt-10"
                   >
                     <motion.div
                       initial={{ scaleX: 0 }}
                       animate={{ scaleX: 1 }}
                       transition={{ delay: 0.6, duration: 0.8 }}
-                      className="w-32 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent mb-8"
+                      className="w-24 md:w-32 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent mb-6 md:mb-8"
                     />
                     <motion.p
                       initial={{ opacity: 0, y: 10, letterSpacing: '0.2em' }}
                       animate={{ opacity: 1, y: 0, letterSpacing: '0.5em' }}
                       transition={{ delay: 0.8, duration: 0.8 }}
-                      className="text-gold text-base md:text-xl tracking-[0.5em] uppercase font-light"
+                      className="text-gold text-sm md:text-xl tracking-[0.3em] sm:tracking-[0.5em] uppercase font-light"
                     >
                       {phases[currentPhase].subtext}
                     </motion.p>
@@ -375,7 +374,7 @@ export function CinematicIntro({
           </div>
 
           {/* Progress dots */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-4">
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 md:gap-4">
             {phases.map((_, index) => (
               <motion.div
                 key={index}
@@ -388,7 +387,7 @@ export function CinematicIntro({
                 className="relative"
               >
                 <div 
-                  className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-all duration-700 ${
+                  className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-700 ${
                     index === currentPhase 
                       ? 'bg-gold scale-125' 
                       : index < currentPhase 
@@ -396,14 +395,6 @@ export function CinematicIntro({
                         : 'bg-white/20'
                   }`}
                 />
-                {index === currentPhase && (
-                  <motion.div
-                    layoutId="activeIndicator"
-                    className="absolute inset-0 w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-gold"
-                    animate={{ scale: [1, 1.8, 1], opacity: [0.6, 0, 0.6] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  />
-                )}
               </motion.div>
             ))}
           </div>
@@ -414,13 +405,11 @@ export function CinematicIntro({
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5 }}
             onClick={() => {
-              if (!hasCompleted.current) {
-                hasCompleted.current = true;
-                setIsComplete(true);
-                onCompleteRef.current?.();
-              }
+              sessionStorage.setItem(INTRO_SHOWN_KEY, 'true');
+              setIsComplete(true);
+              onComplete?.();
             }}
-            className="absolute top-6 right-6 md:top-8 md:right-8 px-5 py-2.5 text-white/60 hover:text-white text-sm tracking-wider uppercase transition-all duration-300 border border-white/20 hover:border-gold hover:text-gold rounded-full backdrop-blur-sm"
+            className="absolute top-4 right-4 md:top-6 md:right-6 px-4 py-2 md:px-5 md:py-2.5 text-white/60 hover:text-white text-xs md:text-sm tracking-wider uppercase transition-all duration-300 border border-white/20 hover:border-gold hover:text-gold rounded-full backdrop-blur-sm"
           >
             Skip
           </motion.button>
@@ -437,26 +426,34 @@ export function SplitRevealIntro({
 }: CinematicIntroProps) {
   const [isComplete, setIsComplete] = useState(false);
   const [showContent, setShowContent] = useState(false);
-  const hasCompleted = useRef(false);
-  const onCompleteRef = useRef(onComplete);
+  const [shouldShow, setShouldShow] = useState(false);
 
   useEffect(() => {
-    onCompleteRef.current = onComplete;
+    // Check if intro was already shown
+    const introShown = sessionStorage.getItem(INTRO_SHOWN_KEY);
+    if (introShown === 'true') {
+      setIsComplete(true);
+      onComplete?.();
+    } else {
+      setShouldShow(true);
+    }
   }, [onComplete]);
 
   useEffect(() => {
+    if (!shouldShow) return;
+    
     setShowContent(true);
     
     const timer = setTimeout(() => {
-      if (!hasCompleted.current) {
-        hasCompleted.current = true;
-        setIsComplete(true);
-        onCompleteRef.current?.();
-      }
+      sessionStorage.setItem(INTRO_SHOWN_KEY, 'true');
+      setIsComplete(true);
+      onComplete?.();
     }, duration);
 
     return () => clearTimeout(timer);
-  }, [duration]);
+  }, [duration, shouldShow, onComplete]);
+
+  if (!shouldShow) return null;
 
   return (
     <AnimatePresence>
@@ -504,18 +501,18 @@ export function SplitRevealIntro({
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 1 }}
-                className="text-center"
+                className="text-center px-4"
               >
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: 'spring', delay: 0.3 }}
-                  className="mb-8"
+                  className="mb-6 md:mb-8"
                 >
                   <img
                     src="/images/malipula/m.png"
                     alt="Malipula"
-                    className="w-28 h-28 md:w-36 md:h-36 mx-auto object-contain"
+                    className="w-20 h-20 md:w-28 md:w-28 md:h-36 mx-auto object-contain"
                   />
                 </motion.div>
                 
@@ -523,7 +520,7 @@ export function SplitRevealIntro({
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="text-4xl md:text-6xl font-bold text-white mb-4"
+                  className="text-3xl md:text-4xl lg:text-6xl font-bold text-white mb-4"
                 >
                   Malipula Suits
                 </motion.h1>
@@ -532,7 +529,7 @@ export function SplitRevealIntro({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.8 }}
-                  className="text-gold text-lg tracking-[0.3em] uppercase"
+                  className="text-gold text-sm md:text-lg tracking-[0.2em] md:tracking-[0.3em] uppercase"
                 >
                   Royal. Rooted. Refined.
                 </motion.p>
