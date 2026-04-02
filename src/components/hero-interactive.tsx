@@ -1,14 +1,14 @@
 'use client';
 
 import { motion, useMotionValue, useSpring, useTransform, useInView } from 'framer-motion';
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ShoppingBag, Play, ArrowRight, Crown, Star, Scissors, Sparkles, ChevronDown } from 'lucide-react';
+import { ShoppingBag, Play, ArrowRight, Crown, Star, Scissors, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 // ============================================
-// 1. MOUSE PARALLAX HOOK
+// 1. MOUSE PARALLAX HOOK (Limited movement)
 // ============================================
 function useMouseParallax(strength: number = 1) {
   const mouseX = useMotionValue(0);
@@ -201,8 +201,8 @@ function TiltCard({ children, className = '', glareEnabled = true }: TiltCardPro
     const rect = ref.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
-    const rotateXValue = ((e.clientY - centerY) / (rect.height / 2)) * -15;
-    const rotateYValue = ((e.clientX - centerX) / (rect.width / 2)) * 15;
+    const rotateXValue = ((e.clientY - centerY) / (rect.height / 2)) * -10;
+    const rotateYValue = ((e.clientX - centerX) / (rect.width / 2)) * 10;
     rotateX.set(rotateXValue);
     rotateY.set(rotateYValue);
   };
@@ -241,38 +241,32 @@ function TiltCard({ children, className = '', glareEnabled = true }: TiltCardPro
 }
 
 // ============================================
-// 6. FLOATING PARTICLES WITH MOUSE INTERACTION
+// 6. FLOATING PARTICLES (Subtle)
 // ============================================
-function InteractiveParticles() {
-  const { mouseX, mouseY } = useMouseParallax(100);
-  const x = useSpring(mouseX, { stiffness: 50, damping: 20 });
-  const y = useSpring(mouseY, { stiffness: 50, damping: 20 });
-
+function FloatingParticles() {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {[...Array(15)].map((_, i) => (
+      {[...Array(12)].map((_, i) => (
         <motion.div
           key={i}
           className="absolute"
           style={{
-            left: `${15 + i * 6}%`,
-            top: `${10 + (i % 5) * 18}%`,
-            x: useTransform(x, (v) => v * (i % 2 === 0 ? 30 : -30)),
-            y: useTransform(y, (v) => v * (i % 2 === 0 ? 30 : -30)),
+            left: `${10 + i * 7}%`,
+            top: `${15 + (i % 4) * 20}%`,
           }}
           animate={{
-            y: [0, -20, 0],
-            opacity: [0.2, 0.5, 0.2],
-            scale: [1, 1.2, 1],
+            y: [0, -15, 0],
+            opacity: [0.2, 0.6, 0.2],
+            scale: [1, 1.3, 1],
           }}
           transition={{
-            duration: 4 + i * 0.5,
+            duration: 3 + i * 0.4,
             repeat: Infinity,
-            delay: i * 0.3,
+            delay: i * 0.25,
             ease: 'easeInOut',
           }}
         >
-          <div className={`w-1.5 h-1.5 rounded-full ${i % 3 === 0 ? 'bg-amber-400' : 'bg-gold'}`} />
+          <div className={`w-1 h-1 rounded-full ${i % 2 === 0 ? 'bg-amber-400/60' : 'bg-amber-300/40'}`} />
         </motion.div>
       ))}
     </div>
@@ -280,94 +274,38 @@ function InteractiveParticles() {
 }
 
 // ============================================
-// 7. FLOATING SUIT CARDS
+// 7. ELEGANT DECORATIVE ELEMENTS
 // ============================================
-function FloatingSuitCards() {
+function DecorativeElements() {
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden hidden lg:block">
-      {/* Left floating card */}
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {/* Subtle rotating circle - top right */}
       <motion.div
-        className="absolute left-8 top-1/3"
-        animate={{
-          y: [0, -15, 0],
-          rotate: [-5, 5, -5],
-        }}
-        transition={{
-          duration: 6,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-      >
-        <TiltCard className="w-48 h-64 rounded-xl overflow-hidden shadow-2xl">
-          <img
-            src="/images/malipula/service1.jpg"
-            alt="Premium Suit"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-          <div className="absolute bottom-3 left-3 right-3">
-            <p className="text-white text-sm font-semibold">Premium Collection</p>
-            <p className="text-amber-400 text-xs">From TZS 450,000</p>
-          </div>
-        </TiltCard>
-      </motion.div>
+        animate={{ rotate: 360 }}
+        transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+        className="absolute -top-20 -right-20 w-80 h-80 border border-amber-500/8 rounded-full"
+      />
+      
+      {/* Subtle rotating circle - bottom left */}
+      <motion.div
+        animate={{ rotate: -360 }}
+        transition={{ duration: 50, repeat: Infinity, ease: 'linear' }}
+        className="absolute -bottom-32 -left-32 w-[450px] h-[450px] border border-amber-500/5 rounded-full"
+      />
 
-      {/* Right floating card */}
-      <motion.div
-        className="absolute right-12 top-1/4"
-        animate={{
-          y: [0, 20, 0],
-          rotate: [5, -5, 5],
-        }}
-        transition={{
-          duration: 7,
-          repeat: Infinity,
-          ease: 'easeInOut',
-          delay: 1,
-        }}
-      >
-        <TiltCard className="w-40 h-56 rounded-xl overflow-hidden shadow-2xl">
-          <img
-            src="/images/malipula/service3.jpg"
-            alt="Traditional Wear"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-          <div className="absolute bottom-3 left-3 right-3">
-            <p className="text-white text-sm font-semibold">Traditional</p>
-            <p className="text-amber-400 text-xs">Custom Made</p>
-          </div>
-        </TiltCard>
-      </motion.div>
-
-      {/* Small accent card */}
-      <motion.div
-        className="absolute right-24 bottom-1/4"
-        animate={{
-          y: [0, -10, 0],
-          x: [0, 5, 0],
-        }}
-        transition={{
-          duration: 5,
-          repeat: Infinity,
-          ease: 'easeInOut',
-          delay: 2,
-        }}
-      >
-        <div className="w-24 h-32 rounded-lg overflow-hidden shadow-xl">
-          <img
-            src="/images/malipula/service2.jpg"
-            alt="Shirts"
-            className="w-full h-full object-cover"
-          />
-        </div>
-      </motion.div>
+      {/* Gold accent lines */}
+      <div className="absolute top-1/4 left-0 w-32 h-[1px] bg-gradient-to-r from-amber-500/30 to-transparent" />
+      <div className="absolute bottom-1/3 right-0 w-40 h-[1px] bg-gradient-to-l from-amber-500/20 to-transparent" />
+      
+      {/* Subtle corner decorations */}
+      <div className="absolute top-20 left-10 w-12 h-12 border-l border-t border-amber-500/20" />
+      <div className="absolute bottom-20 right-10 w-12 h-12 border-r border-b border-amber-500/20" />
     </div>
   );
 }
 
 // ============================================
-// 8. SCROLL INDICATOR WITH ANIMATION
+// 8. SCROLL INDICATOR
 // ============================================
 function ScrollIndicator() {
   return (
@@ -382,12 +320,12 @@ function ScrollIndicator() {
         transition={{ duration: 1.5, repeat: Infinity }}
         className="flex flex-col items-center gap-2"
       >
-        <span className="text-white/50 text-xs tracking-widest uppercase">Explore</span>
-        <div className="w-6 h-10 border-2 border-amber-500/40 rounded-full flex justify-center pt-2">
+        <span className="text-white/40 text-xs tracking-widest uppercase">Scroll</span>
+        <div className="w-5 h-8 border border-amber-500/30 rounded-full flex justify-center pt-1.5">
           <motion.div
-            animate={{ y: [0, 12, 0], opacity: [1, 0.3, 1] }}
+            animate={{ y: [0, 10, 0], opacity: [1, 0.3, 1] }}
             transition={{ duration: 1.5, repeat: Infinity }}
-            className="w-1.5 h-3 bg-amber-400 rounded-full"
+            className="w-1 h-2 bg-amber-400/70 rounded-full"
           />
         </div>
       </motion.div>
@@ -410,46 +348,38 @@ export function InteractiveHeroSection({
     { label: 'Award Winning', value: '2025' },
   ]
 }: InteractiveHeroSectionProps) {
-  const { mouseX, mouseY } = useMouseParallax(50);
-  const backgroundX = useSpring(useTransform(mouseX, (v) => v * 20), { stiffness: 50, damping: 20 });
-  const backgroundY = useSpring(useTransform(mouseY, (v) => v * 20), { stiffness: 50, damping: 20 });
+  // Very subtle parallax - only 5px movement max
+  const { mouseX, mouseY } = useMouseParallax(1);
+  const backgroundX = useSpring(useTransform(mouseX, (v) => v * 5), { stiffness: 100, damping: 30 });
+  const backgroundY = useSpring(useTransform(mouseY, (v) => v * 5), { stiffness: 100, damping: 30 });
 
   const typewriterWords = ['Craftsmanship', 'Elegance', 'Tradition', 'Excellence'];
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image with Parallax */}
-      <motion.div
-        className="absolute inset-0"
-        style={{ x: backgroundX, y: backgroundY, scale: 1.1 }}
-      >
-        <img
-          src="/images/malipula/hero.jpg"
-          alt="Malipula Suits"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-charcoal/95 via-charcoal/80 to-charcoal/60" />
-      </motion.div>
-
-      {/* Interactive Particles */}
-      <InteractiveParticles />
-
-      {/* Floating Suit Cards */}
-      <FloatingSuitCards />
-
-      {/* Decorative Geometric Elements */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-charcoal">
+      {/* Background Image - Fixed position, no white space issue */}
+      <div className="absolute inset-0">
         <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 50, repeat: Infinity, ease: 'linear' }}
-          className="absolute -top-32 -right-32 w-96 h-96 border border-amber-500/10 rounded-full"
-        />
-        <motion.div
-          animate={{ rotate: -360 }}
-          transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
-          className="absolute -bottom-48 -left-48 w-[500px] h-[500px] border border-amber-500/5 rounded-full"
-        />
+          className="absolute inset-[-20px]" // Extra padding to prevent white edges
+          style={{ x: backgroundX, y: backgroundY }}
+        >
+          <img
+            src="/images/malipula/hero.jpg"
+            alt="Malipula Suits"
+            className="w-[calc(100%+40px)] h-[calc(100%+40px)] object-cover object-center"
+          />
+        </motion.div>
+        {/* Dark gradient overlay - covers entire screen */}
+        <div className="absolute inset-0 bg-gradient-to-r from-charcoal/97 via-charcoal/85 to-charcoal/70" />
+        {/* Additional bottom gradient for smooth transition */}
+        <div className="absolute inset-0 bg-gradient-to-t from-charcoal/50 via-transparent to-transparent" />
       </div>
+
+      {/* Floating Particles */}
+      <FloatingParticles />
+
+      {/* Decorative Elements */}
+      <DecorativeElements />
 
       {/* Main Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 md:pt-36 pb-20">
@@ -468,7 +398,7 @@ export function InteractiveHeroSection({
               transition={{ delay: 0.3 }}
               className="mb-6"
             >
-              <Badge className="bg-gold/20 text-gold border-gold/30 px-4 py-2 text-sm">
+              <Badge className="bg-gold/15 text-gold border-gold/25 px-4 py-2 text-sm backdrop-blur-sm">
                 <motion.div
                   animate={{ rotate: [0, 10, -10, 0] }}
                   transition={{ duration: 2, repeat: Infinity }}
@@ -479,7 +409,7 @@ export function InteractiveHeroSection({
               </Badge>
             </motion.div>
 
-            {/* Main Heading with Typewriter */}
+            {/* Main Heading */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -520,10 +450,10 @@ export function InteractiveHeroSection({
               transition={{ delay: 0.8 }}
               className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
             >
-              <MagneticButton href="/shop" strength={0.2}>
+              <MagneticButton href="/shop" strength={0.15}>
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 font-semibold text-lg px-8 py-6 shadow-lg shadow-amber-500/25 transition-all duration-300 group"
+                  className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 font-semibold text-lg px-8 py-6 shadow-lg shadow-amber-500/20 transition-all duration-300 group"
                 >
                   <ShoppingBag className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
                   Shop Collection
@@ -531,11 +461,11 @@ export function InteractiveHeroSection({
                 </Button>
               </MagneticButton>
 
-              <MagneticButton href="/booking" strength={0.2}>
+              <MagneticButton href="/booking" strength={0.15}>
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-2 border-amber-500/50 text-amber-400 hover:bg-amber-500 hover:text-slate-900 hover:border-amber-500 font-semibold text-lg px-8 py-6 transition-all duration-300"
+                  className="border-2 border-amber-500/40 text-amber-400 hover:bg-amber-500 hover:text-slate-900 hover:border-amber-500 font-semibold text-lg px-8 py-6 transition-all duration-300 backdrop-blur-sm"
                 >
                   <Play className="w-5 h-5 mr-2" />
                   Book Fitting
@@ -548,7 +478,7 @@ export function InteractiveHeroSection({
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1 }}
-              className="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-12 pt-8 border-t border-white/20"
+              className="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-12 pt-8 border-t border-white/10"
             >
               {stats.map((stat, index) => (
                 <motion.div
@@ -579,57 +509,57 @@ export function InteractiveHeroSection({
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
-            className="hidden lg:flex justify-center"
+            className="hidden lg:flex justify-center items-center"
           >
-            <TiltCard className="relative w-96" glareEnabled>
+            <TiltCard className="relative w-80" glareEnabled>
               <motion.div
-                animate={{ y: [0, -10, 0] }}
+                animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
               >
-                <div className="relative bg-slate-900/80 backdrop-blur-xl rounded-3xl p-10 text-center border border-amber-500/20 shadow-2xl shadow-amber-500/10">
+                <div className="relative bg-slate-900/70 backdrop-blur-xl rounded-3xl p-8 text-center border border-amber-500/15 shadow-2xl">
                   {/* Decorative corner accents */}
-                  <div className="absolute top-0 left-0 w-20 h-20 border-t-2 border-l-2 border-amber-500/40 rounded-tl-3xl" />
-                  <div className="absolute top-0 right-0 w-20 h-20 border-t-2 border-r-2 border-amber-500/40 rounded-tr-3xl" />
-                  <div className="absolute bottom-0 left-0 w-20 h-20 border-b-2 border-l-2 border-amber-500/40 rounded-bl-3xl" />
-                  <div className="absolute bottom-0 right-0 w-20 h-20 border-b-2 border-r-2 border-amber-500/40 rounded-br-3xl" />
+                  <div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-amber-500/30 rounded-tl-3xl" />
+                  <div className="absolute top-0 right-0 w-16 h-16 border-t-2 border-r-2 border-amber-500/30 rounded-tr-3xl" />
+                  <div className="absolute bottom-0 left-0 w-16 h-16 border-b-2 border-l-2 border-amber-500/30 rounded-bl-3xl" />
+                  <div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-amber-500/30 rounded-br-3xl" />
 
                   {/* Animated Logo */}
                   <motion.div
                     animate={{ rotate: [0, 5, -5, 0] }}
                     transition={{ duration: 6, repeat: Infinity }}
-                    className="mb-6"
+                    className="mb-4"
                   >
                     <img
                       src="/images/malipula/m.png"
                       alt="Malipula"
-                      className="w-32 h-32 mx-auto object-contain"
+                      className="w-24 h-24 mx-auto object-contain"
                     />
                   </motion.div>
 
-                  <h3 className="text-3xl font-bold text-white mb-2">MALIPULA SUITS</h3>
-                  <p className="text-amber-400 mb-6 text-lg">Crafting Excellence Since 2015</p>
+                  <h3 className="text-2xl font-bold text-white mb-1">MALIPULA SUITS</h3>
+                  <p className="text-amber-400 mb-4 text-base">Crafting Excellence Since 2015</p>
 
                   {/* Animated Stars */}
-                  <div className="flex justify-center gap-1 mb-4">
+                  <div className="flex justify-center gap-0.5 mb-3">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <motion.div
                         key={star}
-                        animate={{ scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] }}
+                        animate={{ scale: [1, 1.15, 1], rotate: [0, 5, -5, 0] }}
                         transition={{ duration: 2, repeat: Infinity, delay: star * 0.1 }}
                       >
-                        <Star className="w-6 h-6 text-amber-400 fill-amber-400" />
+                        <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
                       </motion.div>
                     ))}
                   </div>
-                  <p className="text-gray-400 text-sm">Based on 500+ reviews</p>
+                  <p className="text-gray-400 text-xs">Based on 500+ reviews</p>
 
                   {/* Scissors Icon */}
                   <motion.div
                     animate={{ rotate: [0, 360] }}
-                    transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                    className="absolute -bottom-4 -right-4 w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center shadow-lg shadow-amber-500/30"
+                    transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
+                    className="absolute -bottom-3 -right-3 w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center shadow-lg shadow-amber-500/30"
                   >
-                    <Scissors className="w-8 h-8 text-slate-900" />
+                    <Scissors className="w-5 h-5 text-slate-900" />
                   </motion.div>
                 </div>
               </motion.div>
@@ -641,8 +571,8 @@ export function InteractiveHeroSection({
       {/* Scroll Indicator */}
       <ScrollIndicator />
 
-      {/* Gradient Overlay at Bottom */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+      {/* Bottom gradient for smooth section transition */}
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none" />
     </section>
   );
 }
