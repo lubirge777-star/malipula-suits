@@ -47,6 +47,23 @@ function TwitterIcon({ className = "w-5 h-5" }: { className?: string }) {
   );
 }
 
+function TikTokIcon({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15.2a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.88a8.28 8.28 0 0 0 4.76 1.5V6.89a4.83 4.83 0 0 1-1-.2z"/>
+    </svg>
+  );
+}
+
+function EmailIcon({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect x="2" y="4" width="20" height="16" rx="2"/>
+      <path d="M22 7l-10 7L2 7"/>
+    </svg>
+  );
+}
+
 const footerLinks = {
   shop: [
     { name: 'Suits', href: '/shop?category=suits' },
@@ -127,7 +144,9 @@ export function Footer() {
                 { icon: WhatsAppIcon, href: 'https://wa.me/255654321987?text=Hello! I\'m interested in your tailoring services.', color: 'bg-[#25D366] hover:bg-[#20BD5A] hover:shadow-[#25D366]/30', isWhatsApp: true },
                 { icon: InstagramIcon, href: 'https://instagram.com/malipula_suits', color: 'bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 hover:opacity-90' },
                 { icon: FacebookIcon, href: 'https://facebook.com/malipulasuits', color: 'bg-[#1877F2] hover:bg-[#166FE5] hover:shadow-[#1877F2]/30' },
-                { icon: TwitterIcon, href: 'https://twitter.com/malipulasuits', color: 'bg-black hover:bg-gray-800' },
+                { icon: TikTokIcon, href: 'https://tiktok.com/@malipula_suits', color: 'bg-black hover:bg-gray-800' },
+                { icon: TwitterIcon, href: 'https://twitter.com/malipulasuits', color: 'bg-charcoal hover:bg-gray-700 border border-white/10' },
+                { icon: EmailIcon, href: 'mailto:info@malipula.co.tz', color: 'bg-gold/20 hover:bg-gold/30 border border-gold/30' },
               ].map((social, index) => (
                 <motion.a
                   key={index}

@@ -31,6 +31,8 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
   },
+  manifest: "/manifest.json",
+  themeColor: "#C9A962",
   openGraph: {
     title: "Malipula Suits | Royal. Rooted. Refined.",
     description: "Award-winning custom tailoring in Dar es Salaam, Tanzania. Premium bespoke suits, shirts, and traditional wear.",
@@ -53,6 +55,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Malipula" />
+        <link rel="apple-touch-icon" href="/images/malipula/m.png" />
+      </head>
       <body
         className={`${poppins.variable} ${dancingScript.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`}
       >
@@ -60,6 +68,24 @@ export default function RootLayout({
           {children}
         </AuthProvider>
         <Toaster />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function () {
+                  navigator.serviceWorker.register('/sw.js').then(
+                    function (registration) {
+                      console.log('SW registered: ', registration.scope);
+                    },
+                    function (err) {
+                      console.log('SW registration failed: ', err);
+                    }
+                  );
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );
