@@ -19,6 +19,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/lib/auth/auth-context';
+import { toast } from '@/hooks/use-toast';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -36,6 +38,7 @@ const staggerContainer = {
 
 export default function SignupPage() {
   const router = useRouter();
+  const { signUp } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1);
@@ -50,15 +53,63 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (step === 1) {
+      if (!formData.name || !formData.email || !formData.phone) {
+        toast({
+          title: 'Missing fields',
+          description: 'Please fill in all fields to continue.',
+          variant: 'destructive',
+        });
+        return;
+      }
       setStep(2);
       return;
     }
+
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: 'Passwords do not match',
+        description: 'Please check both password fields.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      toast({
+        title: 'Password too short',
+        description: 'Password must be at least 6 characters.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsLoading(true);
-    // Simulate signup
-    setTimeout(() => {
+
+    try {
+      const { error } = await signUp(formData.email, formData.password, formData.name);
+
+      if (error) {
+        toast({
+          title: 'Sign up failed',
+          description: error.message || 'Could not create account. Please try again.',
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Account created!',
+          description: 'Please check your email to verify your account, then sign in.',
+        });
+        router.push('/auth/login');
+      }
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: 'An unexpected error occurred. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
       setIsLoading(false);
-      router.push('/auth/login');
-    }, 1500);
+    }
   };
 
   return (

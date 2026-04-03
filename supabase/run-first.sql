@@ -536,6 +536,46 @@ CREATE POLICY "Fabric images are public" ON storage.objects FOR SELECT USING (bu
 DROP POLICY IF EXISTS "Review images are public" ON storage.objects;
 CREATE POLICY "Review images are public" ON storage.objects FOR SELECT USING (bucket_id = 'reviews');
 
+-- CONTACT SUBMISSIONS
+CREATE TABLE IF NOT EXISTS public.contact_submissions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone TEXT,
+    subject TEXT NOT NULL,
+    message TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.contact_submissions ENABLE ROW LEVEL SECURITY;
+
+-- Anyone can submit contact form (no auth required for insert)
+DROP POLICY IF EXISTS "Anyone can submit contact forms" ON public.contact_submissions;
+CREATE POLICY "Anyone can submit contact forms" ON public.contact_submissions FOR INSERT WITH CHECK (true);
+
+-- Admins can view and manage contact submissions
+DROP POLICY IF EXISTS "Admins can manage contact submissions" ON public.contact_submissions;
+CREATE POLICY "Admins can manage contact submissions" ON public.contact_submissions FOR ALL USING (
+    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'ADMIN')
+);
+
+-- ADD UPDATE POLICY FOR ORDERS (needed by payment flow)
+DROP POLICY IF EXISTS "Users can update own orders" ON public.orders;
+CREATE POLICY "Users can update own orders" ON public.orders FOR UPDATE USING (auth.uid() = user_id);
+
+-- ADD ADMIN POLICIES FOR ORDERS
+DROP POLICY IF EXISTS "Admins can manage all orders" ON public.orders;
+CREATE POLICY "Admins can manage all orders" ON public.orders FOR ALL USING (
+    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'ADMIN')
+);
+
+-- ADD ADMIN POLICIES FOR PAYMENTS
+DROP POLICY IF EXISTS "Admins can manage all payments" ON public.payments;
+CREATE POLICY "Admins can manage all payments" ON public.payments FOR ALL USING (
+    EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'ADMIN')
+);
+
 -- ============================================
 -- SCHEMA COMPLETE!
 -- ============================================
