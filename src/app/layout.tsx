@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Poppins, Geist_Mono, Dancing_Script } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -23,6 +23,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  themeColor: "#C9A962",
+};
+
 export const metadata: Metadata = {
   title: "Malipula Suits | Royal. Rooted. Refined. | Custom Tailoring Dar es Salaam",
   description: "Malipula Suits - Award-winning custom tailoring in Dar es Salaam, Tanzania. Premium bespoke suits, shirts, trousers, and kaftans. Experience exceptional craftsmanship where tradition meets modern style.",
@@ -32,7 +36,6 @@ export const metadata: Metadata = {
     icon: "/favicon.ico",
   },
   manifest: "/manifest.json",
-  themeColor: "#C9A962",
   openGraph: {
     title: "Malipula Suits | Royal. Rooted. Refined.",
     description: "Award-winning custom tailoring in Dar es Salaam, Tanzania. Premium bespoke suits, shirts, and traditional wear.",
