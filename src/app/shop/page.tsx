@@ -403,70 +403,69 @@ export default function ShopPage() {
                 </div>
               )}
 
-              {/* Products Grid */}
+              {/* Products Gallery */}
               {!productsLoading && !productsError && (
-                <motion.div initial="initial" animate="animate" variants={staggerContainer} className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+                <motion.div initial="initial" animate="animate" variants={staggerContainer} className={`grid gap-12 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
                   {filteredProducts.map((product) => (
-                    <motion.div key={product.id} variants={scaleIn} whileHover={{ y: -5 }} className="group">
-                      <Card className="overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-300 bg-card">
-                        <div className="relative aspect-[3/4] overflow-hidden">
+                    <motion.div key={product.id} variants={scaleIn} whileHover={{ y: -10 }} className="group">
+                      <div className="relative bg-navy overflow-hidden rounded-[40px] shadow-2xl transition-all duration-700">
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80 z-10" />
+                        
+                        <div className="relative aspect-[4/5] overflow-hidden">
                           <img 
                             src={product.thumbnail || product.images?.split(',')[0] || '/images/malipula/service1.jpg'} 
                             alt={product.name} 
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                            className="w-full h-full object-cover transition-transform duration-[1500ms] ease-out group-hover:scale-110" 
                           />
-
-                          <div className="absolute top-4 left-4 flex flex-col gap-2">
-                            {product.is_new && <Badge className="bg-gold text-charcoal font-semibold">New</Badge>}
-                            {product.is_featured && <Badge className="bg-navy text-white font-semibold">Featured</Badge>}
+                          
+                          {/* Premium Overlays */}
+                          <div className="absolute top-8 left-8 z-20 flex flex-col gap-3">
+                            {product.is_featured && (
+                              <Badge className="bg-gold text-charcoal border-none px-4 py-1 text-[10px] tracking-[3px] font-bold uppercase shadow-lg">
+                                Artisan's Select
+                              </Badge>
+                            )}
+                            {product.is_new && (
+                              <Badge className="bg-white/10 backdrop-blur-md text-white border-white/20 px-4 py-1 text-[10px] tracking-[3px] font-bold uppercase">
+                                New SS/26
+                              </Badge>
+                            )}
                           </div>
 
-                          <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gold hover:text-charcoal transition-colors">
-                              <Heart className="w-5 h-5" />
-                            </motion.button>
-                            <motion.button 
-                              whileHover={{ scale: 1.1 }} 
-                              whileTap={{ scale: 0.95 }} 
-                              onClick={() => handleAddToCart(product.id)}
-                              className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gold hover:text-charcoal transition-colors"
-                            >
-                              <ShoppingBag className="w-5 h-5" />
-                            </motion.button>
-                          </div>
-
-                          <div className="absolute inset-0 bg-charcoal/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                            <Link href={`/product/${product.id}`}>
-                              <Button className="bg-gold hover:bg-gold-dark text-charcoal font-semibold">View Details</Button>
-                            </Link>
+                          {/* Quick Actions Panel */}
+                          <div className="absolute bottom-8 left-8 right-8 z-20 translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                             <div className="flex items-end justify-between">
+                               <div>
+                                  <p className="text-gold font-bold text-[10px] uppercase tracking-[4px] mb-2">Heritage Piece</p>
+                                  <h3 className="text-white font-display text-3xl leading-tight mb-4">{product.name}</h3>
+                                  <div className="flex items-center gap-6">
+                                     <span className="text-gold font-bold text-xl">TZS {formatPrice(product.base_price)}</span>
+                                     <div className="h-4 w-[1px] bg-white/20" />
+                                     <span className="text-white/60 text-xs tracking-widest uppercase">Bespoke Only</span>
+                                  </div>
+                               </div>
+                               <div className="flex gap-3">
+                                  <button 
+                                    onClick={() => handleAddToCart(product.id)}
+                                    className="w-14 h-14 bg-gold rounded-full flex items-center justify-center text-charcoal hover:bg-white transition-colors shadow-xl"
+                                  >
+                                    <ShoppingBag className="w-6 h-6" />
+                                  </button>
+                                  <Link href={`/product/${product.id}`}>
+                                    <button className="h-14 px-8 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white text-[10px] font-bold uppercase tracking-[2px] hover:bg-white hover:text-navy transition-all">
+                                      Explore
+                                    </button>
+                                  </Link>
+                               </div>
+                             </div>
                           </div>
                         </div>
 
-                        <CardContent className="p-5">
-                          <p className="text-xs text-gold mb-1">{product.category?.name || 'Uncategorized'}</p>
-                          <Link href={`/product/${product.id}`}>
-                            <h3 className="font-semibold text-foreground mb-2 line-clamp-2 group-hover:text-gold transition-colors">
-                              {product.name}
-                            </h3>
-                          </Link>
-
-                          <div className="flex items-center gap-2 mb-3">
-                            <span className="text-xl font-bold text-gold">TZS {formatPrice(product.base_price)}</span>
-                          </div>
-
-                          {product.items && product.items.length > 0 && (
-                            <div className="flex items-center gap-2 flex-wrap">
-                              {product.items.slice(0, 3).map((item) => (
-                                item.color && (
-                                  <span key={item.id} className="text-xs px-2 py-1 bg-muted rounded-full text-muted-foreground">
-                                    {item.color}
-                                  </span>
-                                )
-                              ))}
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
+                        {/* Luxury Card Info (Mobile fallback / Secondary) */}
+                        <div className="p-8 bg-card border-t border-gold/10 hidden">
+                             {/* ... previous content if needed, but the gallery uses overlay ... */}
+                        </div>
+                      </div>
                     </motion.div>
                   ))}
                 </motion.div>

@@ -20,6 +20,7 @@ import {
   Quote,
   Award,
   Sparkles,
+  Box,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -310,7 +311,7 @@ export default function MalipulaHome() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-950 selection:bg-amber-500/30 selection:text-amber-200">
       {/* Scroll Progress Indicator */}
       <ScrollProgress />
 
@@ -319,24 +320,120 @@ export default function MalipulaHome() {
         <CinematicIntro onComplete={handlePreloaderComplete} />
       )}
 
-      {/* WhatsApp Floating Button */}
-      <WhatsAppButton
-        phoneNumber="+255654321987"
-        message="Hello! I'm interested in your tailoring services at Malipula Suits."
-      />
-
       {/* Navigation */}
       <Navigation transparent />
 
-      {/* Interactive Hero Section */}
-      <InteractiveHeroSection 
-        stats={[
-          { label: 'Happy Customers', value: '5,000+', numericValue: 5000 },
-          { label: 'Years of Excellence', value: '10+', numericValue: 10 },
-          { label: 'Custom Designs', value: '15,000+', numericValue: 15000 },
-          { label: 'Award Winning', value: '2025' },
-        ]}
-      />
+      {/* Heritage Hero Section (Sync with Mobile) */}
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        <motion.div 
+            initial={{ scale: 1.1, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            className="absolute inset-0 z-0"
+        >
+            <img 
+                src="/images/heritage_hero.png" 
+                alt="Malipula Heritage" 
+                className="w-full h-full object-cover brightness-50"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-transparent to-slate-950" />
+        </motion.div>
+
+        <div className="relative z-10 text-center px-6 max-w-5xl">
+            <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+            >
+                <Badge className="bg-amber-500/20 text-amber-500 border-amber-500/30 mb-6 px-4 py-1.5 text-[10px] uppercase tracking-[4px]">
+                    The Master Tailor of Tanzania
+                </Badge>
+                <h1 className="text-5xl md:text-8xl font-bold text-white mb-8 tracking-tighter leading-none">
+                    Unveiling Your <span className="text-gold-gradient">Sartorial DNA</span>
+                </h1>
+                <p className="text-slate-300 text-lg md:text-xl max-w-2xl mx-auto mb-10 font-light leading-relaxed">
+                    Crafting the world's finest bespoke Kaunda suits, powered by precision AI and centuries of artisan tradition.
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+                    <Link href="/workshop">
+                        <Button className="h-16 px-10 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-full group transition-all shadow-[0_20px_50px_-15px_rgba(245,158,11,0.5)]">
+                            <Sparkles className="w-5 h-5 mr-3" />
+                            Start 3D Design
+                            <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                        </Button>
+                    </Link>
+                    <Link href="/shop">
+                        <Button variant="outline" className="h-16 px-10 border-white/20 text-white hover:bg-white/5 rounded-full backdrop-blur-md">
+                            Explore Heritage Gallery
+                        </Button>
+                    </Link>
+                </div>
+            </motion.div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <motion.div 
+            animate={{ y: [0, 10, 0] }} 
+            transition={{ repeat: Infinity, duration: 2 }}
+            className="absolute bottom-12 left-1/2 -translate-x-1/2"
+        >
+            <div className="w-[1px] h-12 bg-gradient-to-b from-amber-500 to-transparent" />
+        </motion.div>
+      </section>
+
+      {/* 3D Workshop Callout (Immersive Integration) */}
+      <section className="py-24 bg-slate-950">
+        <div className="max-w-7xl mx-auto px-6">
+            <div className="grid lg:grid-cols-2 gap-16 items-center bg-white/5 rounded-[48px] p-8 md:p-16 border border-white/10 overflow-hidden relative">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 blur-[120px] rounded-full" />
+                
+                <div className="relative z-10">
+                    <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 mb-6">Innovative Tooling</Badge>
+                    <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight">The <span className="text-gold-gradient">Workshop</span> Experience</h2>
+                    <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+                        Design your masterpiece in real-time. Our 3D workshop allows you to visualize every stitch, fabric grain, and silhouette detail before our master tailors begin their work.
+                    </p>
+                    <div className="grid grid-cols-2 gap-8 mb-10">
+                        <div className="space-y-2">
+                             <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                                <Ruler className="text-amber-500 w-5 h-5" />
+                             </div>
+                             <h4 className="text-white font-bold">AI Measured</h4>
+                             <p className="text-slate-500 text-xs text-balance">28 precise metrics captured via our proprietary AI vision engine.</p>
+                        </div>
+                        <div className="space-y-2">
+                             <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                                <Shield className="text-amber-500 w-5 h-5" />
+                             </div>
+                             <h4 className="text-white font-bold">Authentic Only</h4>
+                             <p className="text-slate-500 text-xs text-balance">100% Super 150s Italian Wool and Masterpiece Silk collections.</p>
+                        </div>
+                    </div>
+                    <Link href="/workshop">
+                        <Button className="h-14 px-8 bg-white/5 border border-amber-500/20 text-amber-500 hover:bg-amber-500 hover:text-black rounded-2xl transition-all">
+                            Enter the 3D Workshop
+                        </Button>
+                    </Link>
+                </div>
+
+                <motion.div 
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                    className="relative aspect-square flex items-center justify-center rounded-[40px] overflow-hidden bg-black/40 border border-white/5"
+                >
+                    <div className="absolute inset-0 items-center justify-center flex">
+                        <Box size={120} className="text-amber-500/10" />
+                    </div>
+                    <div className="z-10 text-center">
+                        <div className="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                           <Play className="text-black fill-black w-6 h-6 ml-1" />
+                        </div>
+                        <p className="text-white font-bold text-sm uppercase tracking-widest">Interactive Preview</p>
+                    </div>
+                </motion.div>
+            </div>
+        </div>
+      </section>
 
       {/* Marquee Section */}
       <section className="py-4 sm:py-6 bg-slate-900 overflow-hidden">
