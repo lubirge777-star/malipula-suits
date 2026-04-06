@@ -7,6 +7,55 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+
+  // MOCK DATA for local testing
+  const mockProducts: Record<string, any> = {
+    'p1': {
+      id: 'p1',
+      name: 'Royal Navy Three-Piece Suit',
+      slug: 'royal-navy-three-piece-suit',
+      description: 'A masterpiece of sartorial elegance. Hand-crafted from premium wool, this navy suit features a tailored fit, peaked lapels, and a matching double-breasted waistcoat. Perfect for weddings, galas, and high-stakes business meetings.',
+      base_price: 850000,
+      thumbnail: '/images/malipula/service1.jpg',
+      images: ['/images/malipula/service1.jpg', '/images/malipula/service2.jpg'],
+      product_type: 'SUIT',
+      category: { id: 'c1', name: 'Suits', slug: 'suits' },
+      items: [
+        { id: 'i1', sku: 'MS-RN-3P-48', color: 'Navy', size: '48', price_modifier: 0, stock_quantity: 5 },
+        { id: 'i2', sku: 'MS-RN-3P-50', color: 'Navy', size: '50', price_modifier: 0, stock_quantity: 3 }
+      ]
+    },
+    'p2': {
+      id: 'p2',
+      name: 'Classic Charcoal Blazer',
+      slug: 'classic-charcoal-blazer',
+      description: 'The ultimate versatile piece for your wardrobe. This charcoal blazer transition seamlessly from office to evening events.',
+      base_price: 420000,
+      thumbnail: '/images/malipula/service2.jpg',
+      images: ['/images/malipula/service2.jpg'],
+      product_type: 'SUIT',
+      category: { id: 'c1', name: 'Suits', slug: 'suits' },
+      items: [{ id: 'i3', sku: 'MS-CC-BL-48', color: 'Charcoal', size: '48', price_modifier: 0, stock_quantity: 10 }]
+    },
+    'p3': {
+      id: 'p3',
+      name: 'Premium Egyptian Cotton Shirt',
+      slug: 'premium-egyptian-cotton-shirt',
+      description: 'Experience the breathability and softness of authentic Egyptian cotton. Our signature white shirt is a staple for the modern gentleman.',
+      base_price: 150000,
+      thumbnail: '/images/malipula/team1.jpg',
+      images: ['/images/malipula/team1.jpg'],
+      product_type: 'SHIRT',
+      category: { id: 'c1', name: 'Shirts', slug: 'shirts' },
+      items: [{ id: 'i4', sku: 'MS-EC-SH-M', color: 'White', size: 'M', price_modifier: 0, stock_quantity: 20 }]
+    }
+  };
+
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+    const product = mockProducts[id] || mockProducts['p1'];
+    return NextResponse.json({ product });
+  }
+
   const supabase = await createClient();
   
   const { data, error } = await supabase

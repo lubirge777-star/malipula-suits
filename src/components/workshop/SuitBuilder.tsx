@@ -7,14 +7,51 @@ import { useGLTF, OrbitControls, PerspectiveCamera, Environment, Float, ContactS
 import { motion, AnimatePresence } from 'framer-motion';
 import { Scissors, Ruler, ShieldCheck, Sparkles, ChevronRight, Check } from 'lucide-react';
 
-const SUIT_MODEL_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/SheenChair/glTF/SheenChair.gltf';
+const SUIT_MODEL_URL = 'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/mannequin/model.gltf';
 
-function SuitModel({ material, silhouette }: { material: string, silhouette: string }) {
-  const { nodes, materials } = useGLTF(SUIT_MODEL_URL) as any;
+const lapels = [
+  { id: 'notch', name: 'Notch Lapel', description: 'Classic, versatile everyday style' },
+  { id: 'peak', name: 'Peak Lapel', description: 'Formal, sophisticated power look' },
+  { id: 'shawl', name: 'Shawl Lapel', description: 'Elegant, curved tuxedo style' },
+];
+
+const vents = [
+  { id: 'single', name: 'Single Vent', description: 'Traditional American aesthetic' },
+  { id: 'double', name: 'Double Vent', description: 'Modern British silhouette' },
+  { id: 'none', name: 'No Vent', description: 'Sleek, minimalist profile' },
+];
+
+function SuitModel({ material, silhouette, lapel, vent }: { material: string, silhouette: string, lapel: string, vent: string }) {
+  let model: any = null;
+  try {
+    model = useGLTF(SUIT_MODEL_URL);
+  } catch (e) {
+    console.error('Failed to load suit model:', e);
+  }
   
   const activeColor = material === 'wool' ? '#1A2B44' : material === 'silk' ? '#C9A962' : '#FCFAF2';
   const roughness = material === 'silk' ? 0.2 : 0.8;
 
+  if (!model || !model.nodes) {
+    return (
+      <group scale={3} position={[0, -1, 0]}>
+        <mesh castShadow receiveShadow>
+          <cylinderGeometry args={[0.3, 0.4, 1, 32]} />
+          <meshStandardMaterial 
+            color={activeColor}
+            roughness={roughness}
+            metalness={material === 'silk' ? 0.3 : 0.1}
+          />
+        </mesh>
+        <mesh position={[0, 0.7, 0]} castShadow>
+          <sphereGeometry args={[0.2, 32, 32]} />
+          <meshStandardMaterial color={activeColor} />
+        </mesh>
+      </group>
+    );
+  }
+
+  const { nodes, materials } = model;
   return (
     <group scale={3} position={[0, -1.2, 0]}>
         <mesh 
@@ -51,6 +88,8 @@ const materials = [
 export function SuitBuilder() {
   const [activeSilhouette, setActiveSilhouette] = useState('slim');
   const [activeMaterial, setActiveMaterial] = useState('wool');
+  const [activeLapel, setActiveLapel] = useState('notch');
+  const [activeVent, setActiveVent] = useState('double');
   const [step, setStep] = useState(1);
 
   return (
@@ -65,14 +104,18 @@ export function SuitBuilder() {
           
           <PresentationControls
             global
-            config={{ mass: 2, tension: 500 }}
             snap
             rotation={[0, 0.3, 0]}
             polar={[-Math.PI / 3, Math.PI / 3]}
             azimuth={[-Math.PI / 1.4, Math.PI / 1.4]}
           >
             <Suspense fallback={null}>
-              <SuitModel material={activeMaterial} silhouette={activeSilhouette} />
+              <SuitModel 
+                material={activeMaterial} 
+                silhouette={activeSilhouette} 
+                lapel={activeLapel}
+                vent={activeVent}
+              />
               <Environment preset="city" />
               <ContactShadows position={[0, -1.8, 0]} opacity={0.6} scale={10} blur={2} far={4.5} />
             </Suspense>
@@ -107,7 +150,7 @@ export function SuitBuilder() {
             >
                 <div className="h-[1px] w-8 bg-amber-500" />
                 <span className="text-amber-500 font-medium uppercase text-xs tracking-[4px]">
-                    {activeSilhouette} • {activeMaterial}
+                    {activeSilhouette} • {activeMaterial} • {activeLapel}
                 </span>
                 <div className="h-[1px] w-8 bg-amber-500" />
             </motion.div>
@@ -118,15 +161,15 @@ export function SuitBuilder() {
       <div className="flex-1 bg-slate-900 border-l border-white/5 flex flex-col">
         {/* Step Indicator */}
         <div className="p-8 border-b border-white/5 flex justify-between items-center bg-black/20">
-          <div className="flex gap-8">
-            {['Silhouette', 'Fabric', 'Summary'].map((label, idx) => (
+          <div className="flex gap-6 overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
+            {['Silhouette', 'Fabric', 'Lapel', 'Vents', 'Summary'].map((label, idx) => (
               <button 
                 key={label}
                 onClick={() => setStep(idx + 1)}
-                className="relative group transition-all"
+                className="relative group transition-all shrink-0"
               >
-                <p className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${step === idx + 1 ? 'text-amber-500' : 'text-slate-400 group-hover:text-white'}`}>
-                    0{idx + 1} {label}
+                <p className={`text-[9px] font-bold uppercase tracking-widest mb-1 ${step === idx + 1 ? 'text-amber-500' : 'text-slate-400 group-hover:text-white'}`}>
+                    {idx + 1} {label}
                 </p>
                 {step === idx + 1 && (
                     <motion.div layoutId="web-step-underline" className="h-0.5 w-full bg-amber-500 rounded-full" />
@@ -210,30 +253,96 @@ export function SuitBuilder() {
             {step === 3 && (
               <motion.div 
                 key="step3"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+              >
+                <div className="flex items-center gap-3 mb-8">
+                    <Ruler className="w-5 h-5 text-amber-500" />
+                    <h3 className="text-white text-2xl font-bold">Lapel Configuration</h3>
+                </div>
+                
+                <div className="space-y-4">
+                  {lapels.map((l) => (
+                    <button 
+                      key={l.id} 
+                      onClick={() => setActiveLapel(l.id)}
+                      className={`w-full p-6 rounded-3xl border text-left transition-all duration-300 flex items-center justify-between group ${activeLapel === l.id ? 'bg-amber-500/10 border-amber-500 ring-1 ring-amber-500' : 'bg-white/5 border-white/10 hover:border-white/20'}`}
+                    >
+                      <div>
+                        <h4 className={`text-lg font-bold ${activeLapel === l.id ? 'text-amber-500' : 'text-white'}`}>{l.name}</h4>
+                        <p className="text-slate-400 text-sm mt-1">{l.description}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {step === 4 && (
+              <motion.div 
+                key="step4"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+              >
+                <div className="flex items-center gap-3 mb-8">
+                    <Sparkles className="w-5 h-5 text-amber-500" />
+                    <h3 className="text-white text-2xl font-bold">Vent Distinction</h3>
+                </div>
+                
+                <div className="space-y-4">
+                  {vents.map((v) => (
+                    <button 
+                      key={v.id} 
+                      onClick={() => setActiveVent(v.id)}
+                      className={`w-full p-6 rounded-3xl border text-left transition-all duration-300 flex items-center justify-between group ${activeVent === v.id ? 'bg-amber-500/10 border-amber-500 ring-1 ring-amber-500' : 'bg-white/5 border-white/10 hover:border-white/20'}`}
+                    >
+                      <div>
+                        <h4 className={`text-lg font-bold ${activeVent === v.id ? 'text-amber-500' : 'text-white'}`}>{v.name}</h4>
+                        <p className="text-slate-400 text-sm mt-1">{v.description}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {step === 5 && (
+              <motion.div 
+                key="step5"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-10"
+                className="text-center py-6"
               >
-                <div className="w-24 h-24 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-8">
+                <div className="w-20 h-20 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                     <ShieldCheck className="w-10 h-10 text-amber-500" />
                 </div>
-                <h3 className="text-white text-3xl font-bold mb-4">Precision Verified</h3>
-                <p className="text-slate-400 max-w-sm mx-auto mb-10 leading-relaxed">
-                    Your {activeSilhouette} {activeMaterial} suit is ready for the precision tailoring phase. All metrics are calculated via AI body scanning.
+                <h3 className="text-white text-3xl font-bold mb-2">Style Profile Validated</h3>
+                <p className="text-amber-500/60 font-mono text-xs mb-8 uppercase tracking-[4px]">
+                    MAL-{activeSilhouette.slice(0,2)}-{activeLapel.slice(0,2)}-{activeVent.slice(0,2)}
                 </p>
-                <div className="bg-black/20 rounded-[40px] p-10 border border-white/5 space-y-6">
-                    <div className="flex justify-between items-center text-sm">
-                        <span className="text-slate-500 font-medium">Craftsmanship Time</span>
-                        <span className="text-white font-bold">14-21 Business Days</span>
+                <div className="bg-black/40 rounded-[32px] p-8 border border-white/5 space-y-4">
+                    <div className="flex justify-between items-center text-xs">
+                        <span className="text-slate-500">Silhouette</span>
+                        <span className="text-white font-bold">{activeSilhouette}</span>
                     </div>
-                    <div className="flex justify-between items-center text-sm">
-                        <span className="text-slate-500 font-medium">Measurement Standard</span>
-                        <span className="text-amber-500 font-bold">AI Sartorial Pro</span>
+                    <div className="flex justify-between items-center text-xs">
+                        <span className="text-slate-500">Fabric Selection</span>
+                        <span className="text-white font-bold">{activeMaterial}</span>
                     </div>
-                    <div className="h-[1px] w-full bg-white/5" />
+                    <div className="flex justify-between items-center text-xs">
+                        <span className="text-slate-500">Lapel Detail</span>
+                        <span className="text-white font-bold">{activeLapel}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs">
+                        <span className="text-slate-500">Vent Style</span>
+                        <span className="text-white font-bold">{activeVent}</span>
+                    </div>
+                    <div className="h-[1px] w-full bg-white/5 my-4" />
                     <div className="flex justify-between items-center">
-                        <span className="text-white font-bold text-lg">Total</span>
-                        <span className="text-amber-500 font-bold text-2xl font-serif">$1,250.00</span>
+                        <span className="text-white font-bold text-lg">Bespoke Total</span>
+                        <span className="text-amber-500 font-bold text-2xl font-serif">$1,400.00</span>
                     </div>
                 </div>
               </motion.div>
@@ -244,11 +353,11 @@ export function SuitBuilder() {
         {/* Call to Action */}
         <div className="p-10 border-t border-white/5 bg-black/20">
           <button 
-            onClick={() => step < 3 ? setStep(step + 1) : null}
+            onClick={() => step < 5 ? setStep(step + 1) : null}
             className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold h-16 rounded-full flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-[0_10px_30px_-10px_rgba(245,158,11,0.5)]"
           >
             <span className="uppercase tracking-[4px] text-xs">
-                {step < 3 ? 'Proceed to Fabric' : 'Finalize & Reserve'}
+                {step === 1 ? 'Configure Fabric' : step === 2 ? 'Select Lapel' : step === 3 ? 'Choose Vents' : step === 4 ? 'Review Profile' : 'Finalize & Reserve'}
             </span>
             <ChevronRight className="w-4 h-4" />
           </button>

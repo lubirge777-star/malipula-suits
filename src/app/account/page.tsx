@@ -118,7 +118,7 @@ export default function AccountPage() {
                 </div>
                 <div>
                   <h1 className="text-2xl md:text-3xl font-bold text-white">
-                    Welcome back, {user?.name || 'Guest'}
+                    Welcome back, {user?.user_metadata?.name || user?.email?.split('@')[0] || 'Guest'}
                   </h1>
                   <p className="text-white/50">{user?.email || 'guest@example.com'}</p>
                 </div>

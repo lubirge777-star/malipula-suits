@@ -27,7 +27,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CinematicIntro } from '@/components/preloader';
 import { Marquee } from '@/components/marquee';
-import { WhatsAppButton } from '@/components/whatsapp-button';
+import { WhatsAppButton, ExpandableWhatsAppButton } from '@/components/whatsapp-button';
 import { ServicesCarousel } from '@/components/services-carousel';
 import { TestimonialsCarousel } from '@/components/testimonials-carousel';
 import { ProductIndicators, FeatureCallout } from '@/components/product-indicators';
@@ -191,9 +191,9 @@ const team = [
 ];
 
 const stats = [
-  { label: 'Happy Customers', value: '5,000+' },
-  { label: 'Years of Excellence', value: '10+' },
-  { label: 'Custom Designs', value: '15,000+' },
+  { label: 'Happy Customers', value: '5,000+', numericValue: 5000 },
+  { label: 'Years of Excellence', value: '10+', numericValue: 10 },
+  { label: 'Custom Designs', value: '15,000+', numericValue: 15000 },
   { label: 'Award Winning', value: 'EAGMA 2025' },
 ];
 
@@ -323,63 +323,8 @@ export default function MalipulaHome() {
       {/* Navigation */}
       <Navigation transparent />
 
-      {/* Heritage Hero Section (Sync with Mobile) */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <motion.div 
-            initial={{ scale: 1.1, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
-            className="absolute inset-0 z-0"
-        >
-            <img 
-                src="/images/heritage_hero.png" 
-                alt="Malipula Heritage" 
-                className="w-full h-full object-cover brightness-50"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-transparent to-slate-950" />
-        </motion.div>
-
-        <div className="relative z-10 text-center px-6 max-w-5xl">
-            <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-            >
-                <Badge className="bg-amber-500/20 text-amber-500 border-amber-500/30 mb-6 px-4 py-1.5 text-[10px] uppercase tracking-[4px]">
-                    The Master Tailor of Tanzania
-                </Badge>
-                <h1 className="text-5xl md:text-8xl font-bold text-white mb-8 tracking-tighter leading-none">
-                    Unveiling Your <span className="text-gold-gradient">Sartorial DNA</span>
-                </h1>
-                <p className="text-slate-300 text-lg md:text-xl max-w-2xl mx-auto mb-10 font-light leading-relaxed">
-                    Crafting the world's finest bespoke Kaunda suits, powered by precision AI and centuries of artisan tradition.
-                </p>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                    <Link href="/workshop">
-                        <Button className="h-16 px-10 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-full group transition-all shadow-[0_20px_50px_-15px_rgba(245,158,11,0.5)]">
-                            <Sparkles className="w-5 h-5 mr-3" />
-                            Start 3D Design
-                            <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                        </Button>
-                    </Link>
-                    <Link href="/shop">
-                        <Button variant="outline" className="h-16 px-10 border-white/20 text-white hover:bg-white/5 rounded-full backdrop-blur-md">
-                            Explore Heritage Gallery
-                        </Button>
-                    </Link>
-                </div>
-            </motion.div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <motion.div 
-            animate={{ y: [0, 10, 0] }} 
-            transition={{ repeat: Infinity, duration: 2 }}
-            className="absolute bottom-12 left-1/2 -translate-x-1/2"
-        >
-            <div className="w-[1px] h-12 bg-gradient-to-b from-amber-500 to-transparent" />
-        </motion.div>
-      </section>
+      {/* Master Hero Section */}
+      <InteractiveHeroSection stats={stats} />
 
       {/* 3D Workshop Callout (Immersive Integration) */}
       <section className="py-24 bg-slate-950">
@@ -454,37 +399,7 @@ export default function MalipulaHome() {
         />
       </section>
 
-      {/* Features Section */}
-      <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-background to-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8"
-          >
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                variants={fadeInUp}
-                className="group text-center p-4 sm:p-6 rounded-2xl hover:bg-white/5 transition-colors"
-              >
-                <motion.div
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto mb-3 sm:mb-4 bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-amber-500/30 transition-shadow"
-                >
-                  <feature.icon className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-slate-900" />
-                </motion.div>
-                <h3 className="text-sm sm:text-base md:text-lg font-semibold text-foreground mb-1 sm:mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">{feature.description}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
+
 
       {/* Why Choose Malipula - Scroll Triggered */}
       <section className="bg-slate-950 py-12 sm:py-16 md:py-20">
@@ -1094,6 +1009,13 @@ export default function MalipulaHome() {
 
       {/* Footer */}
       <Footer />
+
+      {/* WhatsApp Support Button */}
+      <ExpandableWhatsAppButton 
+        phoneNumber="+255655123456"
+        message="Hello! I'm interested in booking a consultation for a custom suit at Malipula Suits."
+        tooltipText="Tailoring Expert Online"
+      />
     </div>
   );
 }

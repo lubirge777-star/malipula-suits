@@ -9,6 +9,48 @@ export async function GET(request: Request) {
   const isNew = searchParams.get('new');
   const limit = searchParams.get('limit');
   
+  // MOCK DATA for local testing without Supabase
+  const mockProducts = [
+    {
+      id: 'p1',
+      name: 'Royal Navy Three-Piece Suit',
+      slug: 'royal-navy-three-piece-suit',
+      base_price: 850000,
+      thumbnail: '/images/malipula/service1.jpg',
+      is_new: true,
+      is_featured: true,
+      product_type: 'SUIT',
+      category: { name: 'Suits', slug: 'suits' }
+    },
+    {
+      id: 'p2',
+      name: 'Classic Charcoal Blazer',
+      slug: 'classic-charcoal-blazer',
+      base_price: 420000,
+      thumbnail: '/images/malipula/service2.jpg',
+      is_new: false,
+      is_featured: true,
+      product_type: 'SUIT',
+      category: { name: 'Suits', slug: 'suits' }
+    },
+    {
+      id: 'p3',
+      name: 'Premium Egyptian Cotton Shirt',
+      slug: 'premium-egyptian-cotton-shirt',
+      base_price: 150000,
+      thumbnail: '/images/malipula/team1.jpg',
+      is_new: true,
+      is_featured: false,
+      product_type: 'SHIRT',
+      category: { name: 'Shirts', slug: 'shirts' }
+    }
+  ];
+
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+    console.warn('Using mock products (Supabase keys missing)');
+    return NextResponse.json({ products: mockProducts });
+  }
+
   const supabase = await createClient();
   
   let query = supabase

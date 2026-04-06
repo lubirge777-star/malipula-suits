@@ -3,9 +3,10 @@
 import { motion, useMotionValue, useSpring, useTransform, useInView } from 'framer-motion';
 import { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ShoppingBag, Play, ArrowRight, Crown, Star, Scissors, Sparkles, Award, ChevronDown } from 'lucide-react';
+import { ShoppingBag, Play, ArrowRight, Crown, Star, Scissors, Sparkles, Award, ChevronDown, MessageCircle, Scissors as ScissorsIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { WhatsAppButton } from './whatsapp-button';
 
 // ============================================
 // 1. MOUSE PARALLAX HOOK (Limited movement, disabled on mobile)
@@ -28,7 +29,7 @@ function useMouseParallax(strength: number = 1) {
     if (isMobile) return;
     
     const handleMouseMove = (e: MouseEvent) => {
-      const { clientX, clientY } = window;
+      const { clientX, clientY } = e;
       const { innerWidth, innerHeight } = window;
       mouseX.set((clientX - innerWidth / 2) / innerWidth * strength);
       mouseY.set((clientY - innerHeight / 2) / innerHeight * strength);
@@ -762,14 +763,7 @@ export function InteractiveHeroSection({
                   </div>
                   <p className="text-gray-400 text-xs">Based on 500+ reviews</p>
 
-                  {/* Scissors Icon */}
-                  <motion.div
-                    animate={{ rotate: [0, 360] }}
-                    transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
-                    className="absolute -bottom-2 -right-2 w-10 h-10 xl:w-12 xl:h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center shadow-lg shadow-amber-500/30"
-                  >
-                    <Scissors className="w-4 h-4 xl:w-5 xl:h-5 text-slate-900" />
-                  </motion.div>
+                  {/* Scissors icon - removed from here and made floating */}
                 </div>
               </motion.div>
             </TiltCard>
@@ -782,6 +776,46 @@ export function InteractiveHeroSection({
 
       {/* Scroll Indicator */}
       <ScrollIndicator isMobile={isMobile} />
+
+      {/* Fixed Sidebar "Let's Talk" Button */}
+      <motion.div
+        initial={{ x: 100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ delay: 1.5, type: 'spring' }}
+        className="fixed right-0 top-1/2 -translate-y-1/2 z-50 hidden md:block"
+      >
+        <Link href="/contact">
+          <motion.div
+            whileHover={{ x: -10, backgroundColor: '#000000' }}
+            className="group flex flex-col items-center gap-3 py-6 px-4 bg-slate-900/90 backdrop-blur-md border-l border-y border-amber-500/30 rounded-l-2xl shadow-2xl cursor-pointer"
+            style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
+          >
+            <span className="text-xs font-bold uppercase tracking-[0.3em] text-amber-400 group-hover:text-white transition-colors duration-300">
+              Let's Talk
+            </span>
+            <div className="w-px h-10 bg-gradient-to-b from-amber-500/50 to-transparent group-hover:scale-y-125 transition-transform duration-500Origin-top" />
+            <MessageCircle className="w-5 h-5 text-amber-500 group-hover:scale-110 transition-transform rotate-90" />
+          </motion.div>
+        </Link>
+      </motion.div>
+
+      {/* Floating Scissors Icon */}
+      <motion.div
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 2 }}
+        whileHover={{ scale: 1.1, rotate: 15 }}
+        className="fixed bottom-6 right-24 z-50 hidden sm:flex items-center justify-center w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full shadow-lg shadow-amber-500/30 cursor-pointer"
+      >
+        <ScissorsIcon className="w-6 h-6 text-slate-900" />
+      </motion.div>
+
+      {/* WhatsApp Button with Bubble */}
+      <WhatsAppButton
+        phoneNumber="255621456789"
+        message="Hello! I'd like to talk about bespoke tailoring."
+        tooltipText="Chat with us!"
+      />
 
       {/* Bottom gradient for smooth section transition */}
       <div className="absolute bottom-0 left-0 right-0 h-24 sm:h-24 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none" />

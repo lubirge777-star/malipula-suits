@@ -31,6 +31,10 @@ interface CartItem {
 
 // GET /api/cart - Get user's cart
 export async function GET() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+    return NextResponse.json({ cart: [], count: 0, total: 0 });
+  }
+
   const supabase = await createClient();
   
   const { data: { user } } = await supabase.auth.getUser();
@@ -88,6 +92,23 @@ export async function GET() {
 
 // POST /api/cart - Add item to cart
 export async function POST(request: Request) {
+  const body = await request.json();
+  const { product_id, product_item_id, fabric_id, quantity = 1, customization } = body;
+
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+    return NextResponse.json({ 
+      item: { 
+        id: 'mock-cart-item-' + Date.now(), 
+        product_id, 
+        product_item_id, 
+        fabric_id, 
+        quantity, 
+        customization,
+        created_at: new Date().toISOString()
+      } 
+    });
+  }
+
   const supabase = await createClient();
   
   const { data: { user } } = await supabase.auth.getUser();
@@ -95,9 +116,6 @@ export async function POST(request: Request) {
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  
-  const body = await request.json();
-  const { product_id, product_item_id, fabric_id, quantity = 1, customization } = body;
   
   const { data, error } = await supabase
     .from('cart_items')
@@ -121,6 +139,10 @@ export async function POST(request: Request) {
 
 // DELETE /api/cart - Clear cart
 export async function DELETE() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+    return NextResponse.json({ success: true });
+  }
+
   const supabase = await createClient();
   
   const { data: { user } } = await supabase.auth.getUser();

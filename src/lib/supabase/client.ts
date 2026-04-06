@@ -1,14 +1,11 @@
 import { createBrowserClient } from '@supabase/ssr';
 
 export function createClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder';
 
-  // Return a mock client during build/prerender if env vars are not available
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn('Supabase environment variables not set. Using mock client.');
-    return null as any;
-  }
+  // Return client with placeholders during build/dev if env vars are not available
+  return createBrowserClient(supabaseUrl, supabaseAnonKey);
 
   return createBrowserClient(supabaseUrl, supabaseAnonKey);
 }
